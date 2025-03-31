@@ -36,7 +36,6 @@ android {
 }
 
 dependencies {
-
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.constraintlayout)
@@ -51,6 +50,11 @@ dependencies {
     implementation(libs.activity)
     implementation(libs.firebase.firestore)
     implementation("com.google.android.gms:play-services-auth:20.6.0")
+
+    // 👉 Glide
+    implementation("com.github.bumptech.glide:glide:4.16.0")
+    annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
