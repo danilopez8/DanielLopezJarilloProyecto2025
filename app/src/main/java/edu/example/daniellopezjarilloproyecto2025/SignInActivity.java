@@ -6,6 +6,8 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -21,7 +23,6 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.SignInButton;
-
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -31,19 +32,20 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-
 @SuppressWarnings("deprecation")
 public class SignInActivity extends AppCompatActivity {
 
-    private static final int RC_SIGN_IN = 9001; // Código de solicitud para login con Google
+    private static final int RC_SIGN_IN = 9001;
     private GoogleSignInClient googleSignInClient;
     private FirebaseAuth firebaseAuth;
     private FirebaseFirestore firestore;
+
+    private EditText editEmail, editPassword;
+    private Button btnVipLogin, btnGoRegister;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,11 +63,23 @@ public class SignInActivity extends AppCompatActivity {
         firestore = FirebaseFirestore.getInstance();
 
         configureGoogleSignIn();
+
+        // --- Referencias para VIP login ---
+        editEmail = findViewById(R.id.editTextEmail);
+        editPassword = findViewById(R.id.editTextPassword);
+        btnVipLogin = findViewById(R.id.btnLoginVip);
+        btnGoRegister = findViewById(R.id.btnGoRegisterVip);
+
+        btnVipLogin.setOnClickListener(v -> loginWithEmail());
+        btnGoRegister.setOnClickListener(v -> {
+            Intent intent = new Intent(SignInActivity.this, RegisterVipActivity.class);
+            startActivity(intent);
+        });
     }
 
     private void configureGoogleSignIn() {
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.default_web_client_id)) // Token del google-services.json
+                .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
                 .build();
 
@@ -76,7 +90,6 @@ public class SignInActivity extends AppCompatActivity {
         signInButton.setOnClickListener(v -> signInWithGoogle());
     }
 
-    // Cambia el texto del botón de Google
     private void setGoogleSignInButtonText(SignInButton signInButton, String buttonText) {
         for (int i = 0; i < signInButton.getChildCount(); i++) {
             View view = signInButton.getChildAt(i);
@@ -92,26 +105,21 @@ public class SignInActivity extends AppCompatActivity {
         startActivityForResult(signInIntent, RC_SIGN_IN);
     }
 
-    // *** IMPORTANTE: Manejar la respuesta de Google Sign-In ***
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        // Verifica si el requestCode es el mismo que usaste al iniciar el SignIn con Google
         if (requestCode == RC_SIGN_IN) {
-            // Obtenemos la cuenta de Google
             com.google.android.gms.tasks.Task<GoogleSignInAccount> task =
                     GoogleSignIn.getSignedInAccountFromIntent(data);
             try {
                 GoogleSignInAccount account = task.getResult(com.google.android.gms.common.api.ApiException.class);
                 if (account != null) {
                     firebaseAuthWithGoogle(account);
-                } else {
-                    Toast.makeText(this, "No se obtuvo cuenta de Google", Toast.LENGTH_SHORT).show();
                 }
-            } catch (com.google.android.gms.common.api.ApiException e) {
-                Log.e("GoogleSignIn", "Error en Google Sign-In", e);
+            } catch (Exception e) {
                 Toast.makeText(this, "Google Sign-In Fallido", Toast.LENGTH_SHORT).show();
+                Log.e("GoogleSignIn", "Error", e);
             }
         }
     }
@@ -120,33 +128,42 @@ public class SignInActivity extends AppCompatActivity {
         AuthCredential credential = GoogleAuthProvider.getCredential(account.getIdToken(), null);
         firebaseAuth.signInWithCredential(credential).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
-                // Obtiene el usuario de Firebase
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user != null) {
-                    Log.d("GoogleSignIn", "UID de Firebase: " + user.getUid());
-
-                    // Guarda info en SharedPreferences, etc.
                     saveUserIdToPreferences(user.getUid(), user.getEmail());
-
-                    // Verifica y guarda en Firestore
                     firestore.collection("users").document(user.getUid()).get()
                             .addOnSuccessListener(documentSnapshot -> {
-                                // Si no existe, lo creamos en Firestore
                                 if (!documentSnapshot.exists()) {
                                     saveUserToFirestore(user);
                                 }
-                                // Registrar login
                                 saveLoginToFirestore(user.getUid());
-                                // Ir a la MainActivity
                                 navigateToMainActivity(user);
                             })
                             .addOnFailureListener(e -> Log.e("Firestore", "Error al verificar usuario en Firestore", e));
                 }
-            } else {
-                Log.e("GoogleSignIn", "Error al autenticar con Firebase", task.getException());
-                Toast.makeText(this, "Error al iniciar sesión con Google", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private void loginWithEmail() {
+        String email = editEmail.getText().toString().trim();
+        String password = editPassword.getText().toString().trim();
+
+        if (email.isEmpty() || password.isEmpty()) {
+            Toast.makeText(this, "Introduce email y contraseña", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        firebaseAuth.signInWithEmailAndPassword(email, password)
+                .addOnSuccessListener(authResult -> {
+                    FirebaseUser user = authResult.getUser();
+                    if (user != null) {
+                        saveUserIdToPreferences(user.getUid(), user.getEmail());
+                        saveLoginToFirestore(user.getUid());
+                        navigateToMainActivity(user);
+                    }
+                })
+                .addOnFailureListener(e -> Toast.makeText(this, "Login fallido: " + e.getMessage(), Toast.LENGTH_SHORT).show());
     }
 
     private void navigateToMainActivity(FirebaseUser user) {
@@ -173,8 +190,7 @@ public class SignInActivity extends AppCompatActivity {
 
         firestore.collection("users").document(userId)
                 .update("activity_log", FieldValue.arrayUnion(loginEntry))
-                .addOnSuccessListener(aVoid -> Log.d("Firestore", "Login registrado correctamente."))
-                .addOnFailureListener(e -> Log.e("Firestore", "Error al guardar login en Firestore", e));
+                .addOnFailureListener(e -> Log.e("Firestore", "Error al guardar login", e));
     }
 
     private void saveUserToFirestore(FirebaseUser user) {
@@ -188,7 +204,6 @@ public class SignInActivity extends AppCompatActivity {
 
         firestore.collection("users").document(user.getUid())
                 .set(userData, SetOptions.merge())
-                .addOnSuccessListener(aVoid -> Log.d("Firestore", "Usuario guardado en Firestore: " + user.getUid()))
                 .addOnFailureListener(e -> Log.e("Firestore", "Error al guardar usuario", e));
     }
 
