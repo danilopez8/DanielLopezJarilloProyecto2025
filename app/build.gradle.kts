@@ -50,11 +50,10 @@ dependencies {
     implementation(libs.activity)
     implementation(libs.firebase.firestore)
     implementation("com.google.android.gms:play-services-auth:20.6.0")
-
-    // 👉 Glide
     implementation("com.github.bumptech.glide:glide:4.16.0")
+    implementation("com.google.firebase:firebase-storage:20.3.0")
+    implementation("com.hbb20:ccp:2.5.4")
     annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")
-
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
