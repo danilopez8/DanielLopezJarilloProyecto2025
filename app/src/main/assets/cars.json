@@ -1,0 +1,121 @@
+[
+    {
+        "id": 1,
+        "brand": "Ferrari",
+        "model": "812 Superfast",
+        "year": 2023,
+        "rental_price": 1200,
+        "location": {
+            "lat": 40.4168,
+            "lng": -3.7038,
+            "city": "Madrid"
+        },
+        "images": [
+            "https://images.pexels.com/photos/5126057/pexels-photo-5126057.jpeg",
+            "https://images.pexels.com/photos/2568539/pexels-photo-2568539.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
+            "https://cdn.motor1.com/images/mgl/kLol4/s1/ferrari-812-superfast.jpg"
+        ]
+    },
+    {
+        "id": 2,
+        "brand": "Ferrari",
+        "model": "F8 Tributo",
+        "year": 2022,
+        "rental_price": 1300,
+        "location": {
+            "lat": 41.3851,
+            "lng": 2.1734,
+            "city": "Barcelona"
+        },
+        "images": [
+            "https://images.pexels.com/photos/337909/pexels-photo-337909.jpeg?auto=compress&cs=tinysrgb&w=600",
+            "https://images.unsplash.com/photo-1614200179396-2bdb77ebf81b?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8ZmVycmFyaSUyMGY4JTIwdHJpYnV0b3xlbnwwfHwwfHx8MA%3D%3D",
+            "https://cdn.ferrari.com/cms/network/media/img/resize/6094000bf20b6476b17ee13f-ferrari-magazine-o4dLlptJ3Z.jpg?width=830&height=0"
+        ]
+    },
+    {
+        "id": 3,
+        "brand": "Ferrari",
+        "model": "Portofino",
+        "year": 2021,
+        "rental_price": 1150,
+        "location": {
+            "lat": 39.4699,
+            "lng": -0.3763,
+            "city": "Valencia"
+        },
+        "images": [
+            "https://images.pexels.com/photos/11629361/pexels-photo-11629361.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
+            "https://images.pexels.com/photos/18362446/pexels-photo-18362446/free-photo-of-ferrari-portofino.jpeg",
+            "https://cdn.motor1.com/images/mgl/VE8ZB/s1/2018-ferrari-portofino.jpg"
+        ]
+    },
+    {
+        "id": 4,
+        "brand": "Ferrari",
+        "model": "Roma",
+        "year": 2021,
+        "rental_price": 1100,
+        "location": {
+            "lat": 37.3891,
+            "lng": -5.9845,
+            "city": "Sevilla"
+        },
+        "images": [
+            "https://www.omaze.com/cdn/shop/products/162161161102817669_1024x1024.jpg?v=1622569148",
+            "https://www.meritpartners.com/images/vehicles/260912/RedFerrariRoma_04.jpg",
+            "https://www.exclusiveautomotivegroup.com/imagetag/3914/18/l/Used-2021-Ferrari-Roma-1706555361.jpg"
+        ]
+    },
+    {
+        "id": 5,
+        "brand": "Lamborghini",
+        "model": "Aventador SVJ Roadster",
+        "year": 2022,
+        "rental_price": 1500,
+        "location": {
+            "lat": 43.2630,
+            "lng": -2.9350,
+            "city": "Bilbao"
+        },
+        "images": [
+            "https://unomotors.com/wp-content/uploads/2023/09/DSCF8290.jpg",
+            "https://www.ilusso.com/imagetag/1768/main/l/Used-2020-Lamborghini-Aventador-SVJ-LP-770-4-1707180406.jpg?1744709681",
+            "https://www.autofacil.es/wp-content/uploads/2019/03/533460.jpg"
+        ]
+    },
+    {
+        "id": 6,
+        "brand": "Lamborghini",
+        "model": "Urus",
+        "year": 2023,
+        "rental_price": 1350,
+        "location": {
+            "lat": 36.7213,
+            "lng": -4.4214,
+            "city": "Málaga"
+        },
+        "images": [
+            "https://imagenes.km77.com/fotos/bbtcontent/clippingnew/KM7KPH20220823_0018/full-original.jpg",
+            "https://www.km77.com/images/medium/2/3/6/3/lamborghini-urus-performante-2023-frontal-lateral.362363.jpg",
+            "https://cdn.topgear.es/sites/navi.axelspringer.es/public/media/image/2020/06/lamborghini-urus-pearl-capsule-1971321.jpg?tf=1200x1200"
+        ]
+    },
+    {
+        "id": 7,
+        "brand": "Lamborghini",
+        "model": "Gallardo",
+        "year": 2014,
+        "rental_price": 1250,
+        "location": {
+            "lat": 38.9943,
+            "lng": -1.8585,
+            "city": "Albacete"
+        },
+        "images": [
+            "https://media.ed.edmunds-media.com/lamborghini/gallardo/2012/oem/2012_lamborghini_gallardo_convertible_lp-560-4-spyder_fq_oem_1_1600.jpg",
+            "https://www.km77.com/00/lamborghini/gallardo/lp560-4/med/022.jpg",
+            "https://autosallende.com/wp-content/uploads/2022/09/LAMBORGHINI-GALLARDO-E-GEAR-BLANCO-520CV-2006-AUTOS-ALLENDEDSC_0010-798x466.jpg"
+        ]
+    }
+]
