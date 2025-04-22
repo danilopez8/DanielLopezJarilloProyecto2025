@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "993821819816",
+    "project_id": "daniellopezjarilloproyecto2025",
+    "storage_bucket": "daniellopezjarilloproyecto2025.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:993821819816:android:dddb33f6201a7bf49ad39d",
+        "android_client_info": {
+          "package_name": "edu.example.daniellopezjarilloproyecto2025"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "993821819816-l1i5v719vm93g5j1fl99kn82rcd2peev.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "edu.example.daniellopezjarilloproyecto2025",
+            "certificate_hash": "11c770ea6e3a8b35ce40efe4a27c41da06574612"
+          }
+        },
+        {
+          "client_id": "993821819816-225bbhb9m9js2kdgjt1a4insmhh9artg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAHUIhuFUO3FEcg062mISHJ58lb56YPiNQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "993821819816-225bbhb9m9js2kdgjt1a4insmhh9artg.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
