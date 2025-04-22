@@ -134,7 +134,6 @@ public class CarDetailActivity extends AppCompatActivity implements OnMapReadyCa
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         if (currentUser == null) return;
 
-        // Recuperar las imágenes desde el intent
         List<String> images = getIntent().getStringArrayListExtra("car_images");
 
         Map<String, Object> reservation = new HashMap<>();
@@ -144,8 +143,8 @@ public class CarDetailActivity extends AppCompatActivity implements OnMapReadyCa
         reservation.put("carModel", modelText.getText().toString());
         reservation.put("reservationDate", date);
         reservation.put("location", carCity);
-        reservation.put("carPrice", getIntent().getIntExtra("car_price", 0)); // también guarda precio si lo usas
-        reservation.put("images", images);
+        reservation.put("car_price", getIntent().getIntExtra("car_price", 0));
+        reservation.put("car_images", images); // <- ESTA LÍNEA FALTABA
         reservation.put("timestamp", FieldValue.serverTimestamp());
 
         FirebaseFirestore.getInstance()
@@ -158,6 +157,7 @@ public class CarDetailActivity extends AppCompatActivity implements OnMapReadyCa
                     Toast.makeText(this, "Error al guardar reserva", Toast.LENGTH_SHORT).show();
                 });
     }
+
 
 
     @Override
