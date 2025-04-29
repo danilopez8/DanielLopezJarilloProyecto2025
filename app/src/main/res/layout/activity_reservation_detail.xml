@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/scrollViewReserva"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Carrusel de imágenes -->
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/viewPagerImagesReserva"
+            android:layout_width="match_parent"
+            android:layout_height="250dp" />
+
+        <!-- Marca -->
+        <TextView
+            android:id="@+id/txtReservaBrandDetail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Marca"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginTop="16dp" />
+
+        <!-- Modelo -->
+        <TextView
+            android:id="@+id/txtReservaModelDetail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Modelo"
+            android:textSize="16sp" />
+
+        <!-- Fecha -->
+        <TextView
+            android:id="@+id/txtReservaDateDetail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Fecha"
+            android:textSize="16sp" />
+
+        <!-- Ubicación -->
+        <TextView
+            android:id="@+id/txtReservaLocationDetail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ubicación"
+            android:textSize="16sp"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Precio -->
+        <TextView
+            android:id="@+id/txtReservaPriceDetail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Precio/día"
+            android:textSize="16sp"
+            android:textColor="@android:color/holo_green_dark"
+            android:layout_marginBottom="16dp"/>
+
+        <!-- Mapa con la ubicación -->
+        <fragment
+            android:id="@+id/mapReserva"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Botón para cancelar la reserva -->
+        <Button
+            android:id="@+id/btnCancelReserva"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Cancelar reserva"
+            android:backgroundTint="@android:color/holo_red_dark"
+            android:textColor="@android:color/white"
+            android:layout_marginTop="8dp"/>
+
+    </LinearLayout>
+</ScrollView>

@@ -9,7 +9,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.GridLayoutManager;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -33,7 +33,8 @@ public class ReservasFragment extends Fragment {
         binding = FragmentReservasBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        binding.recyclerViewReservas.setLayoutManager(new LinearLayoutManager(getContext()));
+        // Cambiamos a GridLayoutManager
+        binding.recyclerViewReservas.setLayoutManager(new GridLayoutManager(getContext(), 2));
         adapter = new ReservationAdapter(reservasList, requireContext());
         binding.recyclerViewReservas.setAdapter(adapter);
 
@@ -62,7 +63,9 @@ public class ReservasFragment extends Fragment {
                         if (images == null) {
                             images = new ArrayList<>();
                         }
+                        String idReserva = doc.getId();
                         Reserva reserva = new Reserva(
+                                idReserva,
                                 doc.getString("carBrand"),
                                 doc.getString("carModel"),
                                 doc.getString("reservationDate"),
@@ -70,10 +73,6 @@ public class ReservasFragment extends Fragment {
                                 (doc.getLong("car_price") != null) ? doc.getLong("car_price").intValue() : 0,
                                 images
                         );
-
-
-
-
                         reservasList.add(reserva);
                     }
                     adapter.notifyDataSetChanged();

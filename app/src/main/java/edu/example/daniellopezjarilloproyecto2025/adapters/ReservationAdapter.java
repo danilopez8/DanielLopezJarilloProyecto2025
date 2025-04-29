@@ -17,7 +17,7 @@ import java.util.List;
 
 import edu.example.daniellopezjarilloproyecto2025.R;
 import edu.example.daniellopezjarilloproyecto2025.models.Reserva;
-import edu.example.daniellopezjarilloproyecto2025.ui.concesionario.CarDetailActivity;
+import edu.example.daniellopezjarilloproyecto2025.ui.reservas.ReservationDetailActivity;
 
 public class ReservationAdapter extends RecyclerView.Adapter<ReservationAdapter.ReservationViewHolder> {
 
@@ -26,39 +26,39 @@ public class ReservationAdapter extends RecyclerView.Adapter<ReservationAdapter.
 
     public ReservationAdapter(List<Reserva> reservas, Context context) {
         this.reservas = reservas;
-        this.context = context;
+        this.context  = context;
     }
 
     @NonNull
     @Override
     public ReservationViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.item_reserva, parent, false);
-        return new ReservationViewHolder(view);
+        View v = LayoutInflater.from(context).inflate(R.layout.item_reserva, parent, false);
+        return new ReservationViewHolder(v);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ReservationViewHolder holder, int position) {
-        Reserva reserva = reservas.get(position);
+    public void onBindViewHolder(@NonNull ReservationViewHolder holder, int pos) {
+        Reserva r = reservas.get(pos);
 
-        holder.txtBrand.setText("Marca: " + reserva.brand);
-        holder.txtModel.setText("Modelo: " + reserva.model);
-        holder.txtDate.setText("Fecha: " + reserva.date);
-        holder.txtLocation.setText("Ubicación: " + reserva.location);
+        holder.txtBrand.setText("Marca: " + r.brand);
+        holder.txtModel.setText("Modelo: " + r.model);
+        holder.txtDate.setText("Fecha: " + r.date);
+        holder.txtLocation.setText("Ubicación: " + r.location);
 
-        if (reserva.images != null && !reserva.images.isEmpty()) {
-            Glide.with(context).load(reserva.images.get(0)).into(holder.imageCar);
+        if (r.images != null && !r.images.isEmpty()) {
+            Glide.with(context).load(r.images.get(0)).into(holder.imageCar);
         }
 
         holder.itemView.setOnClickListener(v -> {
-            Intent intent = new Intent(context, CarDetailActivity.class);
-            intent.putExtra("car_brand", reserva.brand);
-            intent.putExtra("car_model", reserva.model);
-            intent.putExtra("car_price", reserva.price);
-            intent.putExtra("car_images", new java.util.ArrayList<>(reserva.images));
-            intent.putExtra("car_lat", 0.0); // Puedes guardar coordenadas si es necesario
-            intent.putExtra("car_lng", 0.0);
-            intent.putExtra("car_city", reserva.location);
-            context.startActivity(intent);
+            Intent i = new Intent(context, ReservationDetailActivity.class);
+            i.putExtra("reservationId", r.reservationId);
+            i.putExtra("brand",         r.brand);
+            i.putExtra("model",         r.model);
+            i.putExtra("date",          r.date);
+            i.putExtra("location",      r.location);
+            i.putExtra("price",         r.price);
+            i.putStringArrayListExtra("images", new java.util.ArrayList<>(r.images));
+            context.startActivity(i);
         });
     }
 
@@ -67,16 +67,16 @@ public class ReservationAdapter extends RecyclerView.Adapter<ReservationAdapter.
         return reservas.size();
     }
 
-    public static class ReservationViewHolder extends RecyclerView.ViewHolder {
+    static class ReservationViewHolder extends RecyclerView.ViewHolder {
         ImageView imageCar;
         TextView txtBrand, txtModel, txtDate, txtLocation;
 
         public ReservationViewHolder(@NonNull View itemView) {
             super(itemView);
-            imageCar = itemView.findViewById(R.id.imageCarReserva);
-            txtBrand = itemView.findViewById(R.id.txtReservaBrand);
-            txtModel = itemView.findViewById(R.id.txtReservaModel);
-            txtDate = itemView.findViewById(R.id.txtReservaDate);
+            imageCar    = itemView.findViewById(R.id.imageCarReserva);
+            txtBrand    = itemView.findViewById(R.id.txtReservaBrand);
+            txtModel    = itemView.findViewById(R.id.txtReservaModel);
+            txtDate     = itemView.findViewById(R.id.txtReservaDate);
             txtLocation = itemView.findViewById(R.id.txtReservaLocation);
         }
     }
