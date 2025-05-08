@@ -16,6 +16,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import edu.example.daniellopezjarilloproyecto2025.adapters.ReservationAdapter;
@@ -59,22 +60,29 @@ public class ReservasFragment extends Fragment {
                 .addOnSuccessListener(querySnapshot -> {
                     reservasList.clear();
                     for (QueryDocumentSnapshot doc : querySnapshot) {
-                        List<String> images = (List<String>) doc.get("car_images");
-                        if (images == null) {
-                            images = new ArrayList<>();
+                        String fecha = doc.getString("reservationDate");
+
+                        if (fecha == null || !esHoyOFutura(fecha)) {
+                            continue; // Oculta del fragmento, pero no borra de Firestore
                         }
-                        String idReserva = doc.getId();
+
+                        List<String> images = (List<String>) doc.get("car_images");
+                        if (images == null) images = new ArrayList<>();
+
                         Reserva reserva = new Reserva(
-                                idReserva,
+                                doc.getId(),
                                 doc.getString("carBrand"),
                                 doc.getString("carModel"),
-                                doc.getString("reservationDate"),
+                                fecha,
                                 doc.getString("location"),
                                 (doc.getLong("car_price") != null) ? doc.getLong("car_price").intValue() : 0,
                                 images
                         );
+
                         reservasList.add(reserva);
                     }
+
+
                     adapter.notifyDataSetChanged();
                 })
                 .addOnFailureListener(e -> {
@@ -82,6 +90,30 @@ public class ReservasFragment extends Fragment {
                     Log.e("ReservasFragment", "Error al obtener reservas", e);
                 });
     }
+
+    private boolean esHoyOFutura(String fechaStr) {
+        try {
+            String[] partes = fechaStr.split("/");
+            int dia = Integer.parseInt(partes[0]);
+            int mes = Integer.parseInt(partes[1]) - 1;
+            int año = Integer.parseInt(partes[2]);
+
+            Calendar fechaReserva = Calendar.getInstance();
+            fechaReserva.set(año, mes, dia, 0, 0, 0);
+            fechaReserva.set(Calendar.MILLISECOND, 0);
+
+            Calendar hoy = Calendar.getInstance();
+            hoy.set(Calendar.HOUR_OF_DAY, 0);
+            hoy.set(Calendar.MINUTE, 0);
+            hoy.set(Calendar.SECOND, 0);
+            hoy.set(Calendar.MILLISECOND, 0);
+
+            return !fechaReserva.before(hoy); // solo muestra hoy o futura
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
 
     @Override
     public void onDestroyView() {

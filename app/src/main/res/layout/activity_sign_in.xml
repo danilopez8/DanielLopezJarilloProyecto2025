@@ -1,79 +1,100 @@
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/fondo"
-    tools:context=".SignInActivity">
+    android:background="@drawable/fondo1">
 
+    <!-- Título -->
     <TextView
         android:id="@+id/textViewLuxe"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Luxe Drive"
-        android:textColor="@color/white"
+        android:textColor="@color/black"
         android:textSize="34sp"
         android:textStyle="bold"
         android:fontFamily="@font/cinzelbold"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/btnGoogleSignIn"
+        android:layout_marginTop="40dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="40dp"/>
+        app:layout_constraintEnd_toEndOf="parent"/>
 
+    <!-- Botón Google Sign-In (puedes estilizarlo con tu drawable si quieres) -->
     <com.google.android.gms.common.SignInButton
         android:id="@+id/btnGoogleSignIn"
         android:layout_width="210dp"
         android:layout_height="48dp"
-        android:layout_marginTop="52dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintTop_toBottomOf="@id/textViewLuxe"
+        android:layout_marginTop="32dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/textViewLuxe" />
+        app:layout_constraintEnd_toEndOf="parent"/>
 
+    <!-- Campo email -->
     <EditText
         android:id="@+id/editTextEmail"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:hint="Correo VIP"
+        android:hint="Correo Electrónico"
         android:inputType="textEmailAddress"
-        app:layout_constraintTop_toBottomOf="@+id/btnGoogleSignIn"
+        android:padding="12dp"
+        android:fontFamily="@font/cinzelbold"
+        android:layout_marginTop="24dp"
+        app:layout_constraintTop_toBottomOf="@id/btnGoogleSignIn"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="20dp"
-        android:layout_marginHorizontal="40dp" />
+        android:layout_marginHorizontal="32dp"/>
 
+    <!-- Campo contraseña -->
     <EditText
         android:id="@+id/editTextPassword"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:hint="Contraseña"
         android:inputType="textPassword"
-        app:layout_constraintTop_toBottomOf="@+id/editTextEmail"
+        android:padding="12dp"
+        android:fontFamily="@font/cinzelbold"
+        android:layout_marginTop="12dp"
+        app:layout_constraintTop_toBottomOf="@id/editTextEmail"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="8dp"
-        android:layout_marginHorizontal="40dp" />
+        android:layout_marginHorizontal="32dp"/>
 
-    <Button
+    <!-- Iniciar sesión (fondo sólido redondeado y cambio de tint en pressed) -->
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/btnLoginVip"
-        android:layout_width="wrap_content"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Acceder VIP"
-        app:layout_constraintTop_toBottomOf="@id/editTextPassword"
-        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginHorizontal="64dp"
+        android:layout_marginTop="24dp"
+        android:fontFamily="@font/cinzelbold"
+        android:text="Iniciar sesión"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
+        app:cornerRadius="24dp"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="12dp"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/editTextPassword" />
 
-    <Button
+    <!-- Regístrate (outline style) -->
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/btnGoRegisterVip"
-        android:layout_width="wrap_content"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="Hazte VIP"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
+        android:text="Regístrate"
+        android:textAllCaps="false"
+        android:fontFamily="@font/cinzelbold"
+        android:textColor="@color/white"
+        android:background="@drawable/bg_button_outline"
+        app:cornerRadius="24dp"
+        app:strokeWidth="2dp"
+        app:layout_constraintTop_toBottomOf="@id/btnLoginVip"
+        android:layout_marginTop="12dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/btnLoginVip" />
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginHorizontal="96dp"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

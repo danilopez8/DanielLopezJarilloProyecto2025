@@ -21,6 +21,7 @@ import edu.example.daniellopezjarilloproyecto2025.ui.reservas.ReservationDetailA
 
 public class ReservationAdapter extends RecyclerView.Adapter<ReservationAdapter.ReservationViewHolder> {
 
+    // Declaramos las variables
     private final List<Reserva> reservas;
     private final Context context;
 
@@ -29,6 +30,7 @@ public class ReservationAdapter extends RecyclerView.Adapter<ReservationAdapter.
         this.context  = context;
     }
 
+    // Inflamos la vista de cada item del RecycledView
     @NonNull
     @Override
     public ReservationViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -36,6 +38,7 @@ public class ReservationAdapter extends RecyclerView.Adapter<ReservationAdapter.
         return new ReservationViewHolder(v);
     }
 
+    // Asignamos los datos de la reserva a la vista
     @Override
     public void onBindViewHolder(@NonNull ReservationViewHolder holder, int pos) {
         Reserva r = reservas.get(pos);
@@ -45,10 +48,12 @@ public class ReservationAdapter extends RecyclerView.Adapter<ReservationAdapter.
         holder.txtDate.setText("Fecha: " + r.date);
         holder.txtLocation.setText("Ubicación: " + r.location);
 
+        // Asignamos la foto
         if (r.images != null && !r.images.isEmpty()) {
             Glide.with(context).load(r.images.get(0)).into(holder.imageCar);
         }
 
+        // Si hacemos click, se nos abre la vista en detalle
         holder.itemView.setOnClickListener(v -> {
             Intent i = new Intent(context, ReservationDetailActivity.class);
             i.putExtra("reservationId", r.reservationId);
@@ -67,6 +72,7 @@ public class ReservationAdapter extends RecyclerView.Adapter<ReservationAdapter.
         return reservas.size();
     }
 
+    // Clase interna ViewHolder que contiene las referencias a las vistas de cada ítem.
     static class ReservationViewHolder extends RecyclerView.ViewHolder {
         ImageView imageCar;
         TextView txtBrand, txtModel, txtDate, txtLocation;
