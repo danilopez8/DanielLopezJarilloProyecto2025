@@ -9,7 +9,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.List;
 
-import edu.example.daniellopezjarilloproyecto2025.ui.concesionario.Car;
+import edu.example.daniellopezjarilloproyecto2025.models.Car;
 
 public class FakeCarData {
 

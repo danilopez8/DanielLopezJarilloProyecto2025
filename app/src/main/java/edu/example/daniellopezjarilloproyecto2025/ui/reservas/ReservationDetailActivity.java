@@ -16,11 +16,19 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.material.datepicker.CalendarConstraints;
+import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 
+import java.util.Calendar;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.TimeZone;
 
 import edu.example.daniellopezjarilloproyecto2025.R;
+import edu.example.daniellopezjarilloproyecto2025.ui.concesionario.CarDetailActivity;
 import edu.example.daniellopezjarilloproyecto2025.ui.concesionario.ImageSliderAdapter;
 
 public class ReservationDetailActivity extends AppCompatActivity implements OnMapReadyCallback {
@@ -82,6 +90,12 @@ public class ReservationDetailActivity extends AppCompatActivity implements OnMa
                             Toast.makeText(this, "Error al cancelar reserva", Toast.LENGTH_SHORT).show()
                     );
         });
+        Button btnEditar = findViewById(R.id.btnEditarReserva);
+
+        btnEditar.setOnClickListener(v -> {
+            showDatePickerForEdit();
+        });
+
     }
 
     @Override
@@ -95,4 +109,54 @@ public class ReservationDetailActivity extends AppCompatActivity implements OnMa
         gm.addMarker(new MarkerOptions().position(loc).title("Ubicación: " + city));
         gm.moveCamera(CameraUpdateFactory.newLatLngZoom(loc, 12f));
     }
+
+    private void showDatePickerForEdit() {
+        long todayUtc = MaterialDatePicker.todayInUtcMilliseconds();
+
+        FirebaseFirestore.getInstance()
+                .collection("reservations")
+                .whereEqualTo("carBrand", getIntent().getStringExtra("brand"))
+                .whereEqualTo("carModel", getIntent().getStringExtra("model"))
+                .get()
+                .addOnSuccessListener(qs -> {
+                    Set<String> fechasReservadas = new HashSet<>();
+                    for (QueryDocumentSnapshot doc : qs) {
+                        String f = doc.getString("reservationDate");
+                        if (f != null) fechasReservadas.add(f);
+                    }
+
+                    CalendarConstraints.DateValidator validator =
+                            new CarDetailActivity.ReservedAndFutureDateValidator(todayUtc, fechasReservadas);
+
+                    MaterialDatePicker<Long> picker = MaterialDatePicker.Builder.datePicker()
+                            .setTitleText("Selecciona nueva fecha")
+                            .setCalendarConstraints(new CalendarConstraints.Builder()
+                                    .setValidator(validator)
+                                    .build())
+                            .build();
+
+                    picker.show(getSupportFragmentManager(), "EDITAR_FECHA");
+
+                    picker.addOnPositiveButtonClickListener(selection -> {
+                        Calendar c = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+                        c.setTimeInMillis(selection);
+                        String nuevaFecha = c.get(Calendar.DAY_OF_MONTH) + "/" +
+                                (c.get(Calendar.MONTH) + 1) + "/" +
+                                c.get(Calendar.YEAR);
+
+                        FirebaseFirestore.getInstance()
+                                .collection("reservations")
+                                .document(reservationId)
+                                .update("reservationDate", nuevaFecha)
+                                .addOnSuccessListener(unused -> {
+                                    Toast.makeText(this, "Fecha actualizada", Toast.LENGTH_SHORT).show();
+                                })
+                                .addOnFailureListener(e -> {
+                                    Toast.makeText(this, "Error al actualizar", Toast.LENGTH_SHORT).show();
+                                });
+                    });
+                });
+    }
+
+
 }

@@ -38,7 +38,7 @@
             android:name=".ui.concesionario.CarDetailActivity"
             android:exported="false" />
         <activity
-            android:name=".RegisterVipActivity"
+            android:name=".RegisterActivity"
             android:exported="false" /> <!-- Actividad para iniciar sesión -->
         <activity
             android:name=".SignInActivity"

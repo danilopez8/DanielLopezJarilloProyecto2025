@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/nav_home"
-        android:name="edu.example.daniellopezjarilloproyecto2025.ui.concesionario.Concesionario"
+        android:name="edu.example.daniellopezjarilloproyecto2025.ui.concesionario.ConcesionarioFragment"
         android:label="@string/menu_home"
         tools:layout="@layout/fragment_concesionario" />
 
@@ -19,7 +19,7 @@
 
     <fragment
         android:id="@+id/nav_slideshow"
-        android:name="edu.example.daniellopezjarilloproyecto2025.ui.slideshow.SlideshowFragment"
+        android:name="edu.example.daniellopezjarilloproyecto2025.ui.filtrar.FiltrarFragment"
         android:label="@string/menu_slideshow"
-        tools:layout="@layout/fragment_slideshow" />
+        tools:layout="@layout/fragment_filtrar" />
 </navigation>

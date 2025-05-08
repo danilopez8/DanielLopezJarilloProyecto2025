@@ -83,7 +83,7 @@ public class SignInActivity extends AppCompatActivity {
 
         // Botón para registrar nuevo usuario VIP
         btnGoRegister.setOnClickListener(v -> {
-            Intent intent = new Intent(SignInActivity.this, RegisterVipActivity.class);
+            Intent intent = new Intent(SignInActivity.this, RegisterActivity.class);
             startActivity(intent);
         });
     }

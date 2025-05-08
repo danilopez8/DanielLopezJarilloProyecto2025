@@ -13,10 +13,10 @@ import java.util.List;
 
 import edu.example.daniellopezjarilloproyecto2025.databinding.FragmentConcesionarioBinding;
 import edu.example.daniellopezjarilloproyecto2025.adapters.CarAdapter;
+import edu.example.daniellopezjarilloproyecto2025.models.Car;
 import edu.example.daniellopezjarilloproyecto2025.utils.FakeCarData;
-import edu.example.daniellopezjarilloproyecto2025.ui.concesionario.Car;
 
-public class Concesionario extends Fragment {
+public class ConcesionarioFragment extends Fragment {
 
     private FragmentConcesionarioBinding binding;
 

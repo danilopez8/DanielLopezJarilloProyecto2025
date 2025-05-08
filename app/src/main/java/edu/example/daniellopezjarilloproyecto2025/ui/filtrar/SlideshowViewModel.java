@@ -1,4 +1,4 @@
-package edu.example.daniellopezjarilloproyecto2025.ui.slideshow;
+package edu.example.daniellopezjarilloproyecto2025.ui.filtrar;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;

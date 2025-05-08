@@ -1,4 +1,4 @@
-package edu.example.daniellopezjarilloproyecto2025.ui.concesionario;
+package edu.example.daniellopezjarilloproyecto2025.models;
 
 import java.util.List;
 
