@@ -1,13 +1,24 @@
+// ReservationDetailActivity.java
 package edu.example.daniellopezjarilloproyecto2025.ui.reservas;
 
-import android.content.Intent;
+import android.Manifest;
+import android.app.AlertDialog;
+import android.content.ContentUris;
+import android.content.ContentValues;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.CalendarContract;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.util.Pair;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -17,21 +28,26 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.datepicker.CalendarConstraints;
+import com.google.android.material.datepicker.CompositeDateValidator;
+import com.google.android.material.datepicker.DateValidatorPointForward;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.Locale;
 
 import edu.example.daniellopezjarilloproyecto2025.R;
 import edu.example.daniellopezjarilloproyecto2025.ui.concesionario.CarDetailActivity;
 import edu.example.daniellopezjarilloproyecto2025.ui.concesionario.ImageSliderAdapter;
 
 public class ReservationDetailActivity extends AppCompatActivity implements OnMapReadyCallback {
+    private static final int REQUEST_CALENDAR = 43;
     private String reservationId;
 
     @Override
@@ -39,7 +55,6 @@ public class ReservationDetailActivity extends AppCompatActivity implements OnMa
         super.onCreate(s);
         setContentView(R.layout.activity_reservation_detail);
 
-        // 1) Recupero extras
         reservationId = getIntent().getStringExtra("reservationId");
         String brand    = getIntent().getStringExtra("brand");
         String model    = getIntent().getStringExtra("model");
@@ -48,7 +63,6 @@ public class ReservationDetailActivity extends AppCompatActivity implements OnMa
         int price       = getIntent().getIntExtra("price", 0);
         List<String> images = getIntent().getStringArrayListExtra("images");
 
-        // 2) Referencias a vistas
         ViewPager2 viewPager    = findViewById(R.id.viewPagerImagesReserva);
         TextView txtMarca       = findViewById(R.id.txtReservaBrandDetail);
         TextView txtModelo      = findViewById(R.id.txtReservaModelDetail);
@@ -56,107 +70,180 @@ public class ReservationDetailActivity extends AppCompatActivity implements OnMa
         TextView txtUbicacion   = findViewById(R.id.txtReservaLocationDetail);
         TextView txtPrecio      = findViewById(R.id.txtReservaPriceDetail);
         Button btnCancelar      = findViewById(R.id.btnCancelReserva);
+        Button btnEditar        = findViewById(R.id.btnEditarReserva);
 
-        // 3) Muestro datos
-        txtMarca    .setText("Marca: "      + brand);
-        txtModelo   .setText("Modelo: "     + model);
-        txtFecha    .setText("Fecha: "      + date);
-        txtUbicacion.setText("Ubicación: "  + location);
-        txtPrecio   .setText("Precio/día: " + price + "€");
+        txtMarca.setText("Marca: " + brand);
+        txtModelo.setText("Modelo: " + model);
+        txtFecha.setText("Fecha: " + date);
+        txtUbicacion.setText("Ubicación: " + location);
+        txtPrecio.setText("Precio/día: " + price + "€");
 
-        // 4) Inicializo carrusel de imágenes
         if (images != null && !images.isEmpty()) {
             viewPager.setAdapter(new ImageSliderAdapter(this, images));
         }
 
-        // 5) Inicializo mapa
         SupportMapFragment mapFrag = (SupportMapFragment)
                 getSupportFragmentManager().findFragmentById(R.id.mapReserva);
-        if (mapFrag != null) {
-            mapFrag.getMapAsync(this);
-        }
+        if (mapFrag != null) mapFrag.getMapAsync(this);
 
-        // 6) Botón cancelar reserva
         btnCancelar.setOnClickListener(v -> {
-            FirebaseFirestore.getInstance()
-                    .collection("reservations")
-                    .document(reservationId)
-                    .delete()
-                    .addOnSuccessListener(aVoid -> {
-                        Toast.makeText(this, "Reserva cancelada", Toast.LENGTH_SHORT).show();
-                        finish();
+            new AlertDialog.Builder(this)
+                    .setTitle("Cancelar reserva")
+                    .setMessage("¿Seguro que quieres cancelar esta reserva?")
+                    .setPositiveButton("Sí", (dialog, which) -> {
+                        // 1) primero obtenemos el eventId para borrarlo del calendario
+                        FirebaseFirestore.getInstance()
+                                .collection("reservations")
+                                .document(reservationId)
+                                .get()
+                                .addOnSuccessListener(doc -> {
+                                    if (doc.contains("eventId") && ensureCalendarPermission()) {
+                                        long eventId = doc.getLong("eventId");
+                                        Uri deleteUri = ContentUris.withAppendedId(
+                                                CalendarContract.Events.CONTENT_URI, eventId);
+                                        getContentResolver().delete(deleteUri, null, null);
+                                    }
+                                    // 2) borramos el documento en Firestore
+                                    FirebaseFirestore.getInstance()
+                                            .collection("reservations")
+                                            .document(reservationId)
+                                            .delete()
+                                            .addOnSuccessListener(aVoid -> {
+                                                Toast.makeText(this, "Reserva cancelada", Toast.LENGTH_SHORT).show();
+                                                finish();
+                                            })
+                                            .addOnFailureListener(e ->
+                                                    Toast.makeText(this, "Error al cancelar reserva", Toast.LENGTH_SHORT).show()
+                                            );
+                                });
                     })
-                    .addOnFailureListener(e ->
-                            Toast.makeText(this, "Error al cancelar reserva", Toast.LENGTH_SHORT).show()
-                    );
+                    .setNegativeButton("No", null)
+                    .show();
         });
-        Button btnEditar = findViewById(R.id.btnEditarReserva);
 
         btnEditar.setOnClickListener(v -> {
-            showDatePickerForEdit();
+            new AlertDialog.Builder(this)
+                    .setTitle("Editar reserva")
+                    .setMessage("¿Quieres cambiar el rango de fechas de esta reserva?")
+                    .setPositiveButton("Sí", (dialog, which) -> showDateRangePickerForEdit())
+                    .setNegativeButton("No", null)
+                    .show();
         });
-
     }
 
     @Override
     public void onMapReady(GoogleMap gm) {
-        // Muestra el marcador en la ubicación de la reserva (si la pasaste como extras)
         double lat = getIntent().getDoubleExtra("lat", 0.0);
         double lng = getIntent().getDoubleExtra("lng", 0.0);
         String city = getIntent().getStringExtra("location");
-
         LatLng loc = new LatLng(lat, lng);
         gm.addMarker(new MarkerOptions().position(loc).title("Ubicación: " + city));
         gm.moveCamera(CameraUpdateFactory.newLatLngZoom(loc, 12f));
     }
 
-    private void showDatePickerForEdit() {
+    private void showDateRangePickerForEdit() {
         long todayUtc = MaterialDatePicker.todayInUtcMilliseconds();
-
         FirebaseFirestore.getInstance()
                 .collection("reservations")
                 .whereEqualTo("carBrand", getIntent().getStringExtra("brand"))
                 .whereEqualTo("carModel", getIntent().getStringExtra("model"))
                 .get()
                 .addOnSuccessListener(qs -> {
-                    Set<String> fechasReservadas = new HashSet<>();
+                    Set<String> reserved = new HashSet<>();
                     for (QueryDocumentSnapshot doc : qs) {
                         String f = doc.getString("reservationDate");
-                        if (f != null) fechasReservadas.add(f);
+                        if (f != null) reserved.add(f);
                     }
-
                     CalendarConstraints.DateValidator validator =
-                            new CarDetailActivity.ReservedAndFutureDateValidator(todayUtc, fechasReservadas);
+                            new CarDetailActivity.ReservedAndFutureDateValidator(todayUtc, reserved);
 
-                    MaterialDatePicker<Long> picker = MaterialDatePicker.Builder.datePicker()
-                            .setTitleText("Selecciona nueva fecha")
-                            .setCalendarConstraints(new CalendarConstraints.Builder()
-                                    .setValidator(validator)
-                                    .build())
+                    CalendarConstraints constraints = new CalendarConstraints.Builder()
+                            .setValidator(CompositeDateValidator.allOf(List.of(
+                                    DateValidatorPointForward.now(), validator
+                            )))
                             .build();
 
-                    picker.show(getSupportFragmentManager(), "EDITAR_FECHA");
+                    MaterialDatePicker<Pair<Long, Long>> picker =
+                            MaterialDatePicker.Builder.dateRangePicker()
+                                    .setTitleText("Selecciona nuevo rango de fechas")
+                                    .setCalendarConstraints(constraints)
+                                    .build();
 
+                    picker.show(getSupportFragmentManager(), "EDITAR_RANGO");
                     picker.addOnPositiveButtonClickListener(selection -> {
-                        Calendar c = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-                        c.setTimeInMillis(selection);
-                        String nuevaFecha = c.get(Calendar.DAY_OF_MONTH) + "/" +
-                                (c.get(Calendar.MONTH) + 1) + "/" +
-                                c.get(Calendar.YEAR);
+                        SimpleDateFormat fmt = new SimpleDateFormat("d/M/yyyy", Locale.getDefault());
+                        Calendar cStart = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+                        cStart.setTimeInMillis(selection.first);
+                        String start = fmt.format(cStart.getTime());
+                        Calendar cEnd = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+                        cEnd.setTimeInMillis(selection.second);
+                        String end = fmt.format(cEnd.getTime());
 
-                        FirebaseFirestore.getInstance()
-                                .collection("reservations")
-                                .document(reservationId)
-                                .update("reservationDate", nuevaFecha)
-                                .addOnSuccessListener(unused -> {
-                                    Toast.makeText(this, "Fecha actualizada", Toast.LENGTH_SHORT).show();
+                        new AlertDialog.Builder(this)
+                                .setTitle("Confirmar edición")
+                                .setMessage("¿Deseas actualizar la reserva al rango de " + start + " al " + end + "?")
+                                .setPositiveButton("Sí", (d,w) -> {
+                                    // primero actualizamos el calendario
+                                    FirebaseFirestore.getInstance()
+                                            .collection("reservations")
+                                            .document(reservationId)
+                                            .get()
+                                            .addOnSuccessListener(doc -> {
+                                                if (doc.contains("eventId") && ensureCalendarPermission()) {
+                                                    long eventId = doc.getLong("eventId");
+                                                    ContentValues vals = new ContentValues();
+                                                    vals.put(CalendarContract.Events.DTSTART, cStart.getTimeInMillis());
+                                                    vals.put(CalendarContract.Events.DTEND,   cEnd.getTimeInMillis());
+                                                    Uri updateUri = ContentUris.withAppendedId(
+                                                            CalendarContract.Events.CONTENT_URI, eventId);
+                                                    getContentResolver().update(updateUri, vals, null, null);
+                                                }
+                                                // ahora actualizamos Firestore
+                                                FirebaseFirestore.getInstance()
+                                                        .collection("reservations")
+                                                        .document(reservationId)
+                                                        .update("startDate", start, "endDate", end)
+                                                        .addOnSuccessListener(a -> {
+                                                            Toast.makeText(this, "Reserva actualizada", Toast.LENGTH_SHORT).show();
+                                                            TextView txtFecha = findViewById(R.id.txtReservaDateDetail);
+                                                            txtFecha.setText("Del " + start + " al " + end);
+                                                        })
+                                                        .addOnFailureListener(e ->
+                                                                Toast.makeText(this, "Error al actualizar reserva", Toast.LENGTH_SHORT).show()
+                                                        );
+                                            });
                                 })
-                                .addOnFailureListener(e -> {
-                                    Toast.makeText(this, "Error al actualizar", Toast.LENGTH_SHORT).show();
-                                });
+                                .setNegativeButton("No", null)
+                                .show();
                     });
                 });
     }
 
+    private boolean ensureCalendarPermission() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_CALENDAR)
+                != PackageManager.PERMISSION_GRANTED
+                || ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CALENDAR)
+                != PackageManager.PERMISSION_GRANTED) {
 
+            ActivityCompat.requestPermissions(this,
+                    new String[]{ Manifest.permission.WRITE_CALENDAR, Manifest.permission.READ_CALENDAR },
+                    REQUEST_CALENDAR);
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQUEST_CALENDAR) {
+            boolean granted = grantResults.length > 0
+                    && grantResults[0] == PackageManager.PERMISSION_GRANTED;
+            if (!granted) {
+                Toast.makeText(this, "Permiso de calendario denegado", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
 }
