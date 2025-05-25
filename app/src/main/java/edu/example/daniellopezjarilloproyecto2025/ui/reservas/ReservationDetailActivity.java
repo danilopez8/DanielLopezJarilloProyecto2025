@@ -91,19 +91,19 @@ public class ReservationDetailActivity extends AppCompatActivity implements OnMa
                     .setTitle("Cancelar reserva")
                     .setMessage("¿Seguro que quieres cancelar esta reserva?")
                     .setPositiveButton("Sí", (dialog, which) -> {
-                        // 1) primero obtenemos el eventId para borrarlo del calendario
                         FirebaseFirestore.getInstance()
                                 .collection("reservations")
                                 .document(reservationId)
                                 .get()
                                 .addOnSuccessListener(doc -> {
+                                    // 1) Borrar del calendario si tenemos eventId y permisos
                                     if (doc.contains("eventId") && ensureCalendarPermission()) {
                                         long eventId = doc.getLong("eventId");
                                         Uri deleteUri = ContentUris.withAppendedId(
                                                 CalendarContract.Events.CONTENT_URI, eventId);
                                         getContentResolver().delete(deleteUri, null, null);
                                     }
-                                    // 2) borramos el documento en Firestore
+                                    // 2) Borrar el documento
                                     FirebaseFirestore.getInstance()
                                             .collection("reservations")
                                             .document(reservationId)
@@ -183,7 +183,7 @@ public class ReservationDetailActivity extends AppCompatActivity implements OnMa
                                 .setTitle("Confirmar edición")
                                 .setMessage("¿Deseas actualizar la reserva al rango de " + start + " al " + end + "?")
                                 .setPositiveButton("Sí", (d,w) -> {
-                                    // primero actualizamos el calendario
+                                    // 1) Actualizar evento en calendario
                                     FirebaseFirestore.getInstance()
                                             .collection("reservations")
                                             .document(reservationId)
@@ -198,7 +198,7 @@ public class ReservationDetailActivity extends AppCompatActivity implements OnMa
                                                             CalendarContract.Events.CONTENT_URI, eventId);
                                                     getContentResolver().update(updateUri, vals, null, null);
                                                 }
-                                                // ahora actualizamos Firestore
+                                                // 2) Actualizar Firestore
                                                 FirebaseFirestore.getInstance()
                                                         .collection("reservations")
                                                         .document(reservationId)
@@ -219,6 +219,7 @@ public class ReservationDetailActivity extends AppCompatActivity implements OnMa
                 });
     }
 
+    /** Asegura que tenemos WRITE/READ_CALENDAR en tiempo de ejecución. */
     private boolean ensureCalendarPermission() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_CALENDAR)
                 != PackageManager.PERMISSION_GRANTED

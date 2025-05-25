@@ -74,8 +74,8 @@
         "year": 2022,
         "rental_price": 1500,
         "location": {
-            "lat": 43.2630,
-            "lng": -2.9350,
+            "lat": 43.263,
+            "lng": -2.935,
             "city": "Bilbao"
         },
         "images": [
@@ -116,6 +116,255 @@
             "https://media.ed.edmunds-media.com/lamborghini/gallardo/2012/oem/2012_lamborghini_gallardo_convertible_lp-560-4-spyder_fq_oem_1_1600.jpg",
             "https://www.km77.com/00/lamborghini/gallardo/lp560-4/med/022.jpg",
             "https://autosallende.com/wp-content/uploads/2022/09/LAMBORGHINI-GALLARDO-E-GEAR-BLANCO-520CV-2006-AUTOS-ALLENDEDSC_0010-798x466.jpg"
+        ]
+    },
+
+    {
+        "id": 8,
+        "brand": "Porsche",
+        "model": "911 Turbo S",
+        "year": 2022,
+        "rental_price": 1400,
+        "location": {
+            "lat": 40.4168,
+            "lng": -3.7038,
+            "city": "Madrid"
+        },
+        "images": [
+            "https://cdn.autobild.es/sites/navi.axelspringer.es/public/bdc/dc/fotos/1535522_high_911_turbo_s_coupe_2020_porsche_ag.jpeg?tf=3840x",
+            "https://d20f7dynuzdeeg.cloudfront.net/cndmotors/21133/foto-Album-de-PORSCHE-911-A-66bf9f144d130.webp",
+            "https://www.autointernationaal.nl/wp-content/uploads/2020/04/Porsche911TurboStest.jpg"
+        ]
+    },
+    {
+        "id": 9,
+        "brand": "McLaren",
+        "model": "720S",
+        "year": 2023,
+        "rental_price": 1550,
+        "location": {
+            "lat": 41.3851,
+            "lng": 2.1734,
+            "city": "Barcelona"
+        },
+        "images": [
+            "https://i0.wp.com/robbreport.mx/wp-content/uploads/2019/04/mcclaren.jpg?fit=1080%2C720&ssl=1",
+            "https://cdn.autobild.es/sites/navi.axelspringer.es/public/bdc/dc/fotos/McLaren-720S-2018-C01.jpg?tf=1200x",
+            "https://67cdn.co.uk/137/3/409525/172683256866ed5fb84a9f5_0s2a8550.jpg?width=479&height=352&crop=auto"
+        ]
+    },
+    {
+        "id": 10,
+        "brand": "Aston Martin",
+        "model": "DB11",
+        "year": 2021,
+        "rental_price": 1250,
+        "location": {
+            "lat": 37.3891,
+            "lng": -5.9845,
+            "city": "Sevilla"
+        },
+        "images": [
+            "https://uncrate.com/p/2020/02/aston-martin-db11-shadow-1.jpg",
+            "https://s1.cdn.autoevolution.com/images/news/gallery/2021-aston-martin-db11-gets-v8-engined-shadow-edition_12.jpg",
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTq08ECZ17fdsHblv0lhBsb8gxQrOf-MBhP31snKnOr3um0VizKc1HTwvh9Ca66un3sDig&usqp=CAU"
+        ]
+    },
+    {
+        "id": 11,
+        "brand": "Audi",
+        "model": "R8 V10",
+        "year": 2022,
+        "rental_price": 1300,
+        "location": {
+            "lat": 39.4699,
+            "lng": -0.3763,
+            "city": "Valencia"
+        },
+        "images": [
+            "https://panoramamotor.com/wp-content/uploads/2022/01/02-4.jpg",
+            "https://www.netcarshow.com/Audi-R8_V10_performance_RWD-2022-Rear.4c517cdd.jpg",
+            "https://www.motortrend.com/uploads/sites/5/2015/02/2017-Audi-R8-V10-Plus-rear-side-view.jpg?w=768&width=768&q=75&format=webp"
+        ]
+    },
+    {
+        "id": 12,
+        "brand": "Mercedes-Benz",
+        "model": "AMG GT R",
+        "year": 2023,
+        "rental_price": 1420,
+        "location": {
+            "lat": 43.263,
+            "lng": -2.935,
+            "city": "Bilbao"
+        },
+        "images": [
+            "https://cdn.motor1.com/images/mgl/eX4ZK/s1/mercedes-amg-gt-coupe-2019-prueba.jpg",
+            "https://cdn.motor1.com/images/mgl/nvYKG/s1/2019-mercedes-amg-gt-r-facelift-spy-photo.jpg",
+            "https://images.cdn.autocar.co.uk/sites/autocar.co.uk/files/mercedes-amg-gt-r-front-end.jpg"
+        ]
+    },
+    {
+        "id": 13,
+        "brand": "BMW",
+        "model": "i8",
+        "year": 2020,
+        "rental_price": 1150,
+        "location": {
+            "lat": 36.7213,
+            "lng": -4.4214,
+            "city": "Málaga"
+        },
+        "images": [
+            "https://www.km77.com/media/fotos/bmw_i8_2018_coupe_6662_1.jpg",
+            "https://images.prismic.io/carwow/97019004-b480-4eb0-83c6-3cd611d7367f_P90285390_highRes_the-new-bmw-i8-coupe+%281%29.jpg",
+            "https://carsales.pxcrush.net/general/car/spec/S0003DOR.jpg?width=618&height=412&watermark=671847805"
+        ]
+    },
+    {
+        "id": 14,
+        "brand": "Tesla",
+        "model": "Model S Plaid",
+        "year": 2023,
+        "rental_price": 1250,
+        "location": {
+            "lat": 38.9943,
+            "lng": -1.8585,
+            "city": "Albacete"
+        },
+        "images": [
+            "https://images0.autocasion.com/unsafe/500x/unoauto/14/1549/35298876d605cfef34d4e90ac02cd7b03bbc737b.jpeg",
+            "https://moscowteslaclub.ru/upload/resize_cache/iblock/923/964_542_2/9c4jbnlj8o55f10rkkfhx04vw20mhnzn.jpg"
+        ]
+    },
+    {
+        "id": 15,
+        "brand": "Bentley",
+        "model": "Continental GT",
+        "year": 2022,
+        "rental_price": 1350,
+        "location": {
+            "lat": 40.4168,
+            "lng": -3.7038,
+            "city": "Madrid"
+        },
+        "images": [
+            "https://a.ccdn.es/cnet/vehicles/17305376/41fd067c-64a5-4d67-b464-a4bf30c08c86.jpg",
+            "https://a.ccdn.es/cnet/vehicles/17305376/3dfc5523-ea07-4f11-8091-7b68aaeee307.jpg",
+            "https://listing-images.autoscout24.ch/867/12076867/1211041449.jpg?w=1920&q=90"
+        ]
+    },
+    {
+        "id": 16,
+        "brand": "Rolls-Royce",
+        "model": "Wraith",
+        "year": 2021,
+        "rental_price": 1450,
+        "location": {
+            "lat": 41.3851,
+            "lng": 2.1734,
+            "city": "Barcelona"
+        },
+        "images": [
+            "https://cdn.motor1.com/images/mgl/13jgw/s1/rolls-royce-black-badge-wraith-by-spofec.webp",
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSiODvfRH9Tzgx995P0cOSebLMUfLo1aZcN_K1aoIvDR1nSH-rJkBIBS-qZwBaNDTzYJZQ&usqp=CAU"
+        ]
+    },
+    {
+        "id": 17,
+        "brand": "Bugatti",
+        "model": "Chiron",
+        "year": 2023,
+        "rental_price": 25000,
+        "location": {
+            "lat": 39.4699,
+            "lng": -0.3763,
+            "city": "Valencia"
+        },
+        "images": [
+            "https://cdn.autobild.es/sites/navi.axelspringer.es/public/media/image/2023/02/bugatti-chiron-profilee-2946286.jpg?tf=3840x",
+            "https://news.dupontregistry.com/wp-content/uploads/2023/07/bugatti-chiron-profilee-main-scaled.jpg",
+            "https://cdn.motor1.com/images/mgl/jlxPQy/s3/bugatti-chiron-profilee-2022.jpg"
+        ]
+    },
+    {
+        "id": 18,
+        "brand": "Jaguar",
+        "model": "F-Type R",
+        "year": 2022,
+        "rental_price": 1200,
+        "location": {
+            "lat": 37.3891,
+            "lng": -5.9845,
+            "city": "Sevilla"
+        },
+        "images": [
+            "https://hips.hearstapps.com/hmg-prod/images/2021-jaguar-f-type-r-103-1594736398.jpg?crop=0.606xw:0.454xh;0.296xw,0.302xh&resize=1200:*",
+            "https://www.motorbiscuit.com/wp-content/uploads/2022/07/2023-Jaguar-F-Type-P450-AWD-R-Dynamic-Convertible-rear-3_4.jpg?w=925&strip=all&quality=89"
+        ]
+    },
+    {
+        "id": 19,
+        "brand": "Maserati",
+        "model": "GranTurismo",
+        "year": 2021,
+        "rental_price": 1150,
+        "location": {
+            "lat": 43.263,
+            "lng": -2.935,
+            "city": "Bilbao"
+        },
+        "images": [
+            "https://www.km77.com/media/fotos/maserati_granturismo_2007_2468_1.jpg",
+            "https://static0.topspeedimages.com/wordpress/wp-content/uploads/jpg/200710/2007-maserati-granturismo-58.jpg"
+        ]
+    },
+    {
+        "id": 20,
+        "brand": "Koenigsegg",
+        "model": "Jesko",
+        "year": 2023,
+        "rental_price": 20000,
+        "location": {
+            "lat": 40.4168,
+            "lng": -3.7038,
+            "city": "Madrid"
+        },
+        "images": [
+            "https://preview.redd.it/koenigsegg-jesko-2023-1600hp-480-km-h-v0-gce3ik4kffpb1.jpg?width=640&crop=smart&auto=webp&s=851618ecd3e747e1b6a61902cd82ace38f14de78",
+            "https://imagenes.eltiempo.com/files/image_1200_535/uploads/2023/12/19/6581d640539c0.png"
+        ]
+    },
+    {
+        "id": 21,
+        "brand": "Pagani",
+        "model": "Huayra",
+        "year": 2021,
+        "rental_price": 18000,
+        "location": {
+            "lat": 41.3851,
+            "lng": 2.1734,
+            "city": "Barcelona"
+        },
+        "images": [
+            "https://thebigcollector.com/8875-large_default/hot-wheels-collectors-rlc-exclusive-2021-pagani-huayra-r.jpg",
+            "https://www.truecollector.pl/images/mini/500px_pagani6.png"
+        ]
+    },
+    {
+        "id": 22,
+        "brand": "Ford",
+        "model": "GT",
+        "year": 2022,
+        "rental_price": 1600,
+        "location": {
+            "lat": 36.7213,
+            "lng": -4.4214,
+            "city": "Málaga"
+        },
+        "images": [
+            "https://cdn.motor1.com/images/mgl/zxp4P6/s1/2022-ford-gt-lm-edition.jpg",
+            "https://fordmediacenter.nl/wp-content/uploads/2022/10/03_Laatste-special-edition-nieuwe-2022-Ford-GT-LM-Edition-scaled.jpg"
         ]
     }
 ]

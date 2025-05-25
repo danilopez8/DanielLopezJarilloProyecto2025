@@ -21,4 +21,11 @@
         android:orderInCategory="102"
         android:title="Eliminar cuenta"
         app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_toggle_dark"
+        android:title="Modo oscuro"
+        android:orderInCategory="102"
+        app:showAsAction="never" />
+
 </menu>

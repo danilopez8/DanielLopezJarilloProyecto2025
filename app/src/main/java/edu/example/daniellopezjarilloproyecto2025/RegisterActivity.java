@@ -20,9 +20,9 @@ import java.util.Map;
 
 public class RegisterActivity extends AppCompatActivity {
 
-    private EditText editEmail, editPassword, editConfirmPassword;
+    private EditText editName, editEmail, editPassword, editConfirmPassword;
     private Button btnRegister;
-    private FirebaseAuth   firebaseAuth;
+    private FirebaseAuth firebaseAuth;
     private FirebaseFirestore firestore;
 
     @Override
@@ -31,10 +31,11 @@ public class RegisterActivity extends AppCompatActivity {
         setContentView(R.layout.activity_register);
 
         // referencias
-        editEmail = findViewById(R.id.editEmail);
-        editPassword = findViewById(R.id.editPassword);
+        editName            = findViewById(R.id.editName);
+        editEmail           = findViewById(R.id.editEmail);
+        editPassword        = findViewById(R.id.editPassword);
         editConfirmPassword = findViewById(R.id.editConfirmPassword);
-        btnRegister = findViewById(R.id.btnRegister);
+        btnRegister         = findViewById(R.id.btnRegister);
 
         firebaseAuth = FirebaseAuth.getInstance();
         firestore    = FirebaseFirestore.getInstance();
@@ -43,11 +44,12 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     private void registrarUsuario() {
+        String name     = editName.getText().toString().trim();
         String email    = editEmail.getText().toString().trim();
         String password = editPassword.getText().toString().trim();
         String confirm  = editConfirmPassword.getText().toString().trim();
 
-        if (email.isEmpty() || password.isEmpty() || confirm.isEmpty()) {
+        if (name.isEmpty() || email.isEmpty() || password.isEmpty() || confirm.isEmpty()) {
             Toast.makeText(this, "Rellena todos los campos", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -59,7 +61,9 @@ public class RegisterActivity extends AppCompatActivity {
         firebaseAuth.createUserWithEmailAndPassword(email, password)
                 .addOnSuccessListener(auth -> {
                     FirebaseUser user = auth.getUser();
-                    if (user != null) guardarUsuarioEnFirestore(user.getUid(), email);
+                    if (user != null) {
+                        guardarUsuarioEnFirestore(user.getUid(), name, email);
+                    }
                 })
                 .addOnFailureListener(e -> {
                     Log.e("RegisterVIP", "Error registro", e);
@@ -67,13 +71,14 @@ public class RegisterActivity extends AppCompatActivity {
                 });
     }
 
-    private void guardarUsuarioEnFirestore(String uid, String email) {
+    private void guardarUsuarioEnFirestore(String uid, String name, String email) {
         Map<String,Object> data = new HashMap<>();
-        data.put("userId", uid);
-        data.put("email", email);
-        data.put("vip", false);      // usuario normal
-        data.put("login_time",     com.google.firebase.Timestamp.now());
-        data.put("logout_time",    null);
+        data.put("userId",     uid);
+        data.put("name",       name);     // <-- nuevo
+        data.put("email",      email);
+        data.put("vip",        false);    // usuario normal
+        data.put("login_time",    com.google.firebase.Timestamp.now());
+        data.put("logout_time",   null);
 
         firestore.collection("users")
                 .document(uid)

@@ -7,6 +7,7 @@ import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcel;
@@ -69,6 +70,9 @@ public class CarDetailActivity extends AppCompatActivity implements OnMapReadyCa
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_car_detail);
+
+        // Pedimos permiso de calendario tan pronto abrimos la pantalla
+        ensureCalendarPermission();
 
         viewPager  = findViewById(R.id.viewPagerImages);
         brandText  = findViewById(R.id.txtDetailBrand);
@@ -251,9 +255,8 @@ public class CarDetailActivity extends AppCompatActivity implements OnMapReadyCa
                 .add(reserva)
                 .addOnSuccessListener(docRef -> {
                     Toast.makeText(this, "Reserva guardada correctamente", Toast.LENGTH_SHORT).show();
-                    // 1) solicitamos permiso si no lo tenemos
+                    // Insertar en calendario sólo si ya tenemos permiso
                     if (!ensureCalendarPermission()) return;
-                    // 2) parsear fechas
                     try {
                         SimpleDateFormat fmt = new SimpleDateFormat("d/M/yyyy", Locale.getDefault());
                         Date dStart = fmt.parse(start);
@@ -266,7 +269,7 @@ public class CarDetailActivity extends AppCompatActivity implements OnMapReadyCa
                                     carCity
                             );
                             if (eventId != -1) {
-                                // 3) guardar eventId en Firestore
+                                // Guardar el eventId en Firestore para luego poder borrarlo o editarlo
                                 FirebaseFirestore.getInstance()
                                         .collection("reservations")
                                         .document(docRef.getId())
@@ -289,15 +292,37 @@ public class CarDetailActivity extends AppCompatActivity implements OnMapReadyCa
 
     /** Inserta directamente en el CalendarProvider y devuelve el eventId. */
     private long insertEventToCalendar(long beginMillis, long endMillis, String title, String location) {
+        long calId = getPrimaryCalendarId();
+        if (calId == -1) {
+            Toast.makeText(this, "No hay calendario válido", Toast.LENGTH_SHORT).show();
+            return -1;
+        }
         ContentValues values = new ContentValues();
         values.put(CalendarContract.Events.DTSTART, beginMillis);
         values.put(CalendarContract.Events.DTEND,   endMillis);
         values.put(CalendarContract.Events.TITLE,   title);
         values.put(CalendarContract.Events.EVENT_LOCATION, location);
-        values.put(CalendarContract.Events.CALENDAR_ID, 1);
+        values.put(CalendarContract.Events.CALENDAR_ID, calId);
         values.put(CalendarContract.Events.EVENT_TIMEZONE, TimeZone.getDefault().getID());
         Uri uri = getContentResolver().insert(CalendarContract.Events.CONTENT_URI, values);
         return uri == null ? -1 : Long.parseLong(uri.getLastPathSegment());
+    }
+
+    /** Obtiene un CALENDAR_ID válido del dispositivo. */
+    private long getPrimaryCalendarId() {
+        String[] proj = new String[]{ CalendarContract.Calendars._ID };
+        Cursor cursor = getContentResolver().query(
+                CalendarContract.Calendars.CONTENT_URI,
+                proj,
+                CalendarContract.Calendars.VISIBLE + " = 1",
+                null, null);
+        if (cursor != null && cursor.moveToFirst()) {
+            long id = cursor.getLong(0);
+            cursor.close();
+            return id;
+        }
+        if (cursor != null) cursor.close();
+        return -1;
     }
 
     /** Asegura que tenemos WRITE/READ_CALENDAR en tiempo de ejecución. */
@@ -361,8 +386,12 @@ public class CarDetailActivity extends AppCompatActivity implements OnMapReadyCa
         @Override public int describeContents(){ return 0; }
         public static final Parcelable.Creator<ReservedAndFutureDateValidator> CREATOR =
                 new Parcelable.Creator<ReservedAndFutureDateValidator>(){
-                    @Override public ReservedAndFutureDateValidator createFromParcel(Parcel in){ return new ReservedAndFutureDateValidator(in); }
-                    @Override public ReservedAndFutureDateValidator[] newArray(int size){ return new ReservedAndFutureDateValidator[size]; }
+                    @Override public ReservedAndFutureDateValidator createFromParcel(Parcel in){
+                        return new ReservedAndFutureDateValidator(in);
+                    }
+                    @Override public ReservedAndFutureDateValidator[] newArray(int size){
+                        return new ReservedAndFutureDateValidator[size];
+                    }
                 };
     }
 }

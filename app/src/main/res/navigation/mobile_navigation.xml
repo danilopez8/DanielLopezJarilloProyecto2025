@@ -22,4 +22,10 @@
         android:name="edu.example.daniellopezjarilloproyecto2025.ui.filtrar.FiltrarFragment"
         android:label="@string/menu_slideshow"
         tools:layout="@layout/fragment_filtrar" />
+
+    <fragment
+        android:id="@+id/editProfileFragment"
+        android:name="edu.example.daniellopezjarilloproyecto2025.ui.profile.EditProfileFragment"
+        android:label="Editar perfil" />
+
 </navigation>
