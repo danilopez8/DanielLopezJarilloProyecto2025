@@ -17,7 +17,10 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 import edu.example.daniellopezjarilloproyecto2025.adapters.ReservationAdapter;
 import edu.example.daniellopezjarilloproyecto2025.databinding.FragmentReservasBinding;
@@ -43,6 +46,12 @@ public class ReservasFragment extends Fragment {
 
         return root;
     }
+    @Override
+    public void onResume() {
+        super.onResume();
+        cargarReservas();  // vuelve a hacer la consulta y refresca la lista
+    }
+
 
     private void cargarReservas() {
         String userEmail = FirebaseAuth.getInstance().getCurrentUser() != null ?
@@ -58,31 +67,47 @@ public class ReservasFragment extends Fragment {
                 .whereEqualTo("email", userEmail)
                 .get()
                 .addOnSuccessListener(querySnapshot -> {
-                    reservasList.clear();
+                    // Agrupar reservas por mismo rango de fechas
+                    Map<String, Reserva> grouped = new LinkedHashMap<>();
                     for (QueryDocumentSnapshot doc : querySnapshot) {
-                        String fecha = doc.getString("reservationDate");
-
-                        if (fecha == null || !esHoyOFutura(fecha)) {
-                            continue; // Oculta del fragmento, pero no borra de Firestore
+                        String start = doc.getString("startDate");
+                        String end   = doc.getString("endDate");
+                        if (start == null || end == null || !rangoValido(start, end)) {
+                            continue;
                         }
 
+                        // Key única para el mismo rango
+                        String key = start + "|" + end;
+                        if (grouped.containsKey(key)) continue;
+
+                        // Obtener imágenes
                         List<String> images = (List<String>) doc.get("car_images");
                         if (images == null) images = new ArrayList<>();
+
+                        // Precio robusto
+                        Object priceObj = doc.get("car_price");
+                        int price = 0;
+                        if (priceObj instanceof Number) {
+                            price = ((Number) priceObj).intValue();
+                        } else if (priceObj instanceof String) {
+                            try { price = Integer.parseInt((String) priceObj); }
+                            catch (NumberFormatException ignored) {}
+                        }
 
                         Reserva reserva = new Reserva(
                                 doc.getId(),
                                 doc.getString("carBrand"),
                                 doc.getString("carModel"),
-                                fecha,
+                                "Del " + start + " al " + end,
                                 doc.getString("location"),
-                                (doc.getLong("car_price") != null) ? doc.getLong("car_price").intValue() : 0,
+                                price,
                                 images
                         );
-
-                        reservasList.add(reserva);
+                        grouped.put(key, reserva);
                     }
 
-
+                    reservasList.clear();
+                    reservasList.addAll(grouped.values());
                     adapter.notifyDataSetChanged();
                 })
                 .addOnFailureListener(e -> {
@@ -91,16 +116,18 @@ public class ReservasFragment extends Fragment {
                 });
     }
 
-    private boolean esHoyOFutura(String fechaStr) {
+    private boolean rangoValido(String startStr, String endStr) {
         try {
-            String[] partes = fechaStr.split("/");
-            int dia = Integer.parseInt(partes[0]);
-            int mes = Integer.parseInt(partes[1]) - 1;
-            int año = Integer.parseInt(partes[2]);
+            String[] p1 = startStr.split("/");
+            String[] p2 = endStr.split("/");
 
-            Calendar fechaReserva = Calendar.getInstance();
-            fechaReserva.set(año, mes, dia, 0, 0, 0);
-            fechaReserva.set(Calendar.MILLISECOND, 0);
+            Calendar start = Calendar.getInstance();
+            start.set(Integer.parseInt(p1[2]), Integer.parseInt(p1[1]) - 1, Integer.parseInt(p1[0]), 0, 0, 0);
+            start.set(Calendar.MILLISECOND, 0);
+
+            Calendar end = Calendar.getInstance();
+            end.set(Integer.parseInt(p2[2]), Integer.parseInt(p2[1]) - 1, Integer.parseInt(p2[0]), 0, 0, 0);
+            end.set(Calendar.MILLISECOND, 0);
 
             Calendar hoy = Calendar.getInstance();
             hoy.set(Calendar.HOUR_OF_DAY, 0);
@@ -108,12 +135,11 @@ public class ReservasFragment extends Fragment {
             hoy.set(Calendar.SECOND, 0);
             hoy.set(Calendar.MILLISECOND, 0);
 
-            return !fechaReserva.before(hoy); // solo muestra hoy o futura
+            return !end.before(hoy);
         } catch (Exception e) {
             return false;
         }
     }
-
 
     @Override
     public void onDestroyView() {

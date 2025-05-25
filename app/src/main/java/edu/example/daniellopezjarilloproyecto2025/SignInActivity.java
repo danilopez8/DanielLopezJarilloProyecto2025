@@ -14,6 +14,7 @@ import android.widget.Toast;
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -40,20 +41,35 @@ import java.util.Map;
 @SuppressWarnings("deprecation")
 public class SignInActivity extends AppCompatActivity {
 
+    private static final String PREFS_NAME     = "MyPrefs";
+    private static final String KEY_DARK_MODE  = "dark_mode";
+    private static final String THEME_PREFS = "ThemePrefs";
+
     // Constante para identificar el resultado del login de Google
     private static final int RC_SIGN_IN = 9001;
 
     // Variables para Google Sign-In, FirebaseAuth y Firestore
-    private GoogleSignInClient googleSignInClient;
-    private FirebaseAuth firebaseAuth;
-    private FirebaseFirestore firestore;
+    private GoogleSignInClient    googleSignInClient;
+    private FirebaseAuth          firebaseAuth;
+    private FirebaseFirestore     firestore;
 
     // Campos de entrada para email y contraseña (VIP) y botones
-    private EditText editEmail, editPassword;
-    private Button btnVipLogin, btnGoRegister;
+    private EditText  editEmail, editPassword;
+    private Button    btnVipLogin, btnGoRegister;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        // --- Aplico el tema según la última preferencia guardada ---
+        SharedPreferences themePrefs = getSharedPreferences(THEME_PREFS, Context.MODE_PRIVATE);
+        boolean darkMode = themePrefs.getBoolean(KEY_DARK_MODE, false);
+        AppCompatDelegate.setDefaultNightMode(
+                darkMode
+                        ? AppCompatDelegate.MODE_NIGHT_YES
+                        : AppCompatDelegate.MODE_NIGHT_NO
+        );
+        // ----------------------------------------------------------
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_in); // Establece el layout
 
@@ -67,15 +83,15 @@ public class SignInActivity extends AppCompatActivity {
 
         // Inicializamos Firebase Auth y Firestore
         firebaseAuth = FirebaseAuth.getInstance();
-        firestore = FirebaseFirestore.getInstance();
+        firestore   = FirebaseFirestore.getInstance();
 
         // Configuramos el login con Google
         configureGoogleSignIn();
 
         // Asignamos los campos de texto y botones del layout
-        editEmail = findViewById(R.id.editTextEmail);
-        editPassword = findViewById(R.id.editTextPassword);
-        btnVipLogin = findViewById(R.id.btnLoginVip);
+        editEmail     = findViewById(R.id.editTextEmail);
+        editPassword  = findViewById(R.id.editTextPassword);
+        btnVipLogin   = findViewById(R.id.btnLoginVip);
         btnGoRegister = findViewById(R.id.btnGoRegisterVip);
 
         // Al hacer click en login, intentamos iniciar sesión con email y contraseña
@@ -87,6 +103,7 @@ public class SignInActivity extends AppCompatActivity {
             startActivity(intent);
         });
     }
+
 
     // Configuración para el inicio de sesión con Google
     private void configureGoogleSignIn() {
@@ -156,9 +173,11 @@ public class SignInActivity extends AppCompatActivity {
                                     saveUserToFirestore(user);
                                 }
                                 saveLoginToFirestore(user.getUid()); // Guardamos fecha de login
-                                navigateToMainActivity(user); // Lo llevamos al Main
+                                navigateToMainActivity(user);         // Lo llevamos al Main
                             })
-                            .addOnFailureListener(e -> Log.e("Firestore", "Error al verificar usuario en Firestore", e));
+                            .addOnFailureListener(e ->
+                                    Log.e("Firestore", "Error al verificar usuario en Firestore", e)
+                            );
                 }
             }
         });
@@ -166,7 +185,7 @@ public class SignInActivity extends AppCompatActivity {
 
     // Login con correo y contraseña para usuarios VIP
     private void loginWithEmail() {
-        String email = editEmail.getText().toString().trim();
+        String email    = editEmail.getText().toString().trim();
         String password = editPassword.getText().toString().trim();
 
         if (email.isEmpty() || password.isEmpty()) {
@@ -183,13 +202,15 @@ public class SignInActivity extends AppCompatActivity {
                         navigateToMainActivity(user);
                     }
                 })
-                .addOnFailureListener(e -> Toast.makeText(this, "Login fallido: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+                .addOnFailureListener(e ->
+                        Toast.makeText(this, "Login fallido: " + e.getMessage(), Toast.LENGTH_SHORT).show()
+                );
     }
 
-    // navegamos el MainActivity tras iniciar sesión
+    // Navegamos al MainActivity tras iniciar sesión
     private void navigateToMainActivity(FirebaseUser user) {
         Intent intent = new Intent(SignInActivity.this, MainActivity.class);
-        intent.putExtra("USER_NAME", user.getDisplayName());
+        intent.putExtra("USER_NAME",  user.getDisplayName());
         intent.putExtra("USER_EMAIL", user.getEmail());
         intent.putExtra("USER_PHOTO", user.getPhotoUrl() != null ? user.getPhotoUrl().toString() : "");
         startActivity(intent);
@@ -198,8 +219,8 @@ public class SignInActivity extends AppCompatActivity {
 
     // Guardamos el ID y email del usuario en preferencias locales
     private void saveUserIdToPreferences(String userId, String email) {
-        SharedPreferences.Editor editor = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE).edit();
-        editor.putString("USER_ID", userId);
+        SharedPreferences.Editor editor = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).edit();
+        editor.putString("USER_ID",    userId);
         editor.putString("USER_EMAIL", email);
         editor.apply();
     }
@@ -208,31 +229,36 @@ public class SignInActivity extends AppCompatActivity {
     private void saveLoginToFirestore(String userId) {
         String loginTime = getCurrentTime();
         Map<String, Object> loginEntry = new HashMap<>();
-        loginEntry.put("login_time", loginTime);
+        loginEntry.put("login_time",  loginTime);
         loginEntry.put("logout_time", null);
 
         firestore.collection("users").document(userId)
                 .update("activity_log", FieldValue.arrayUnion(loginEntry))
-                .addOnFailureListener(e -> Log.e("Firestore", "Error al guardar login", e));
+                .addOnFailureListener(e ->
+                        Log.e("Firestore", "Error al guardar login", e)
+                );
     }
 
     // Guardamos datos del usuario en Firestore si no existen
     private void saveUserToFirestore(FirebaseUser user) {
         Map<String, Object> userData = new HashMap<>();
         userData.put("userId", user.getUid());
-        userData.put("email", user.getEmail());
-        userData.put("name", user.getDisplayName());
+        userData.put("email",  user.getEmail());
+        userData.put("name",   user.getDisplayName());
         if (user.getPhotoUrl() != null) {
             userData.put("photoUrl", user.getPhotoUrl().toString());
         }
 
         firestore.collection("users").document(user.getUid())
                 .set(userData, SetOptions.merge())
-                .addOnFailureListener(e -> Log.e("Firestore", "Error al guardar usuario", e));
+                .addOnFailureListener(e ->
+                        Log.e("Firestore", "Error al guardar usuario", e)
+                );
     }
 
     // Obtenemos la hora actual en formato texto
     private String getCurrentTime() {
-        return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date());
+        return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+                .format(new Date());
     }
 }
