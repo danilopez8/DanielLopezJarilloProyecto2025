@@ -8,6 +8,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.util.Consumer;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
@@ -16,53 +17,44 @@ import edu.example.daniellopezjarilloproyecto2025.R;
 import edu.example.daniellopezjarilloproyecto2025.models.Marca;
 
 public class MarcaAdapter extends RecyclerView.Adapter<MarcaAdapter.MarcaViewHolder> {
-
-    // Interfaz para manejar el clic en una marca
-    public interface OnMarcaClickListener {
-        void onMarcaClick(String nombreMarca);
-    }
-
-    // Declaramos las variables
-    private final List<Marca> lista;
+    private final List<Marca> marcas;
     private final Context context;
-    private final OnMarcaClickListener listener;
+    private final Consumer<String> onMarcaClick;
 
-    public MarcaAdapter(List<Marca> lista, Context context, OnMarcaClickListener listener) {
-        this.lista = lista;
+    public MarcaAdapter(List<Marca> marcas, Context context, Consumer<String> onMarcaClick) {
+        this.marcas = marcas;
         this.context = context;
-        this.listener = listener;
+        this.onMarcaClick = onMarcaClick;
     }
 
-    // Método para inflar el layout del ítem de la marca y devolver el ViewHolder.
-    @NonNull
-    @Override
+    @NonNull @Override
     public MarcaViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(context).inflate(R.layout.item_marca, parent, false);
-        return new MarcaViewHolder(v);
+        View view = LayoutInflater.from(context)
+                .inflate(R.layout.item_marca, parent, false);
+        return new MarcaViewHolder(view);
     }
 
-    // Asignamos los datos de cada marca a su vista correspondiente.
     @Override
     public void onBindViewHolder(@NonNull MarcaViewHolder holder, int position) {
-        Marca m = lista.get(position);
-        holder.txt.setText(m.nombre);
-        holder.img.setImageResource(m.iconoResId);
-        holder.itemView.setOnClickListener(v -> listener.onMarcaClick(m.nombre));
+        Marca m = marcas.get(position);
+        holder.txtNombre.setText(m.nombre);
+        holder.imgIcon.setImageResource(m.iconoResId);
+        holder.itemView.setOnClickListener(v -> onMarcaClick.accept(m.nombre));
     }
 
-    // Número total de elementos en la lista
     @Override
     public int getItemCount() {
-        return lista.size();
+        return marcas.size();
     }
 
-    public static class MarcaViewHolder extends RecyclerView.ViewHolder {
-        ImageView img;
-        TextView txt;
-        public MarcaViewHolder(@NonNull View itemView) {
+    static class MarcaViewHolder extends RecyclerView.ViewHolder {
+        ImageView imgIcon;
+        TextView txtNombre;
+
+        MarcaViewHolder(@NonNull View itemView) {
             super(itemView);
-            img = itemView.findViewById(R.id.imgMarca); // ImageView del logo de la marca.
-            txt = itemView.findViewById(R.id.txtMarca); // TextView del nombre de la marca.
+            imgIcon    = itemView.findViewById(R.id.imgMarcaIcon);
+            txtNombre  = itemView.findViewById(R.id.txtMarcaNombre);
         }
     }
 }

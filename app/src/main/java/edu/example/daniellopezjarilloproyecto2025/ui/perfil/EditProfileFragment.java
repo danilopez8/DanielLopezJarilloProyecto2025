@@ -1,15 +1,14 @@
-package edu.example.daniellopezjarilloproyecto2025.ui.profile;
+package edu.example.daniellopezjarilloproyecto2025.ui.perfil;
 
 import android.Manifest;
 import android.app.Activity;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.view.View;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -23,6 +22,7 @@ import androidx.fragment.app.Fragment;
 import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.io.ByteArrayOutputStream;
@@ -34,12 +34,13 @@ import edu.example.daniellopezjarilloproyecto2025.databinding.FragmentEditProfil
 public class EditProfileFragment extends Fragment {
 
     private FragmentEditProfileBinding b;
-    private Uri         pickedImageUri;
-    private String      currentPhotoUrl;
-    private final FirebaseFirestore db   = FirebaseFirestore.getInstance();
-    private final FirebaseUser      user = FirebaseAuth.getInstance().getCurrentUser();
+    private Uri                      pickedImageUri;
+    private String                   currentPhotoUrl;
+    private final FirebaseFirestore  db   = FirebaseFirestore.getInstance();
+    private final FirebaseUser       user = FirebaseAuth.getInstance().getCurrentUser();
+    private boolean                  isVip;
 
-    // 1) Launcher para resultado cámara
+    // Cámara
     private final ActivityResultLauncher<Intent> cameraLauncher =
             registerForActivityResult(
                     new ActivityResultContracts.StartActivityForResult(),
@@ -48,12 +49,12 @@ public class EditProfileFragment extends Fragment {
                             Object extras = result.getData().getExtras().get("data");
                             if (extras instanceof Bitmap) {
                                 Bitmap bitmap = (Bitmap) extras;
-                                // convertimos a Uri temporal
                                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                                 bitmap.compress(Bitmap.CompressFormat.JPEG, 90, baos);
                                 String path = MediaStore.Images.Media.insertImage(
                                         requireContext().getContentResolver(),
-                                        bitmap, "captured", null);
+                                        bitmap, "captured", null
+                                );
                                 pickedImageUri = Uri.parse(path);
                                 b.ivProfileImage.setImageBitmap(bitmap);
                             }
@@ -61,7 +62,7 @@ public class EditProfileFragment extends Fragment {
                     }
             );
 
-    // 2) Launcher para resultado galería
+    // Galería
     private final ActivityResultLauncher<String> galleryLauncher =
             registerForActivityResult(
                     new ActivityResultContracts.GetContent(),
@@ -74,39 +75,69 @@ public class EditProfileFragment extends Fragment {
             );
 
     @Nullable @Override
-    public android.view.View onCreateView(@NonNull android.view.LayoutInflater inflater,
-                                          android.view.ViewGroup container,
-                                          Bundle savedInstanceState) {
+    public View onCreateView(@NonNull android.view.LayoutInflater inflater,
+                             android.view.ViewGroup container,
+                             Bundle savedInstanceState) {
         b = FragmentEditProfileBinding.inflate(inflater, container, false);
 
-        // Cargo datos actuales
-        if (user != null) {
-            db.collection("users").document(user.getUid())
-                    .get()
-                    .addOnSuccessListener(doc -> {
-                        if (doc.exists()) {
-                            b.etName.setText(doc.getString("name"));
-                            b.etPhone.setText(doc.getString("phone"));
-                            b.etAddress.setText(doc.getString("address"));
-                            String url = doc.getString("photoUrl");
-                            if (url != null) {
-                                currentPhotoUrl = url;
-                                Glide.with(this).load(url).into(b.ivProfileImage);
-                            }
-                        }
-                    });
+        if (user == null) {
+            Toast.makeText(requireContext(), "No autenticado", Toast.LENGTH_SHORT).show();
+            requireActivity().onBackPressed();
+            return b.getRoot();
         }
 
-        // Botón “Seleccionar imagen”
-        b.btnSelectImage.setOnClickListener(v -> showImagePickerDialog());
+        // 1) Cargo datos + VIP
+        db.collection("users").document(user.getUid())
+                .get()
+                .addOnSuccessListener(doc -> {
+                    if (!doc.exists()) {
+                        Toast.makeText(requireContext(), "Usuario no encontrado", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
 
-        // Botón “Guardar”
-        b.btnSave.setOnClickListener(v -> saveProfile());
+                    // VIP?
+                    Boolean vipFlag = doc.getBoolean("vip");
+                    isVip = Boolean.TRUE.equals(vipFlag);
+
+                    // Rellenar campos
+                    b.etName.setText(doc.getString("name"));
+                    b.etPhone.setText(doc.getString("phone"));
+                    b.etAddress.setText(doc.getString("address"));
+                    String url = doc.getString("photoUrl");
+                    if (url != null) {
+                        currentPhotoUrl = url;
+                        Glide.with(this).load(url).into(b.ivProfileImage);
+                    }
+
+                    // Si NO es VIP, deshabilitar edición
+                    if (!isVip) {
+                        b.btnSelectImage.setVisibility(View.GONE);
+                        b.btnSave       .setVisibility(View.GONE);
+                        b.etName  .setEnabled(false);
+                        b.etPhone .setEnabled(false);
+                        b.etAddress.setEnabled(false);
+                        Toast.makeText(requireContext(),
+                                "Solo usuarios VIP pueden editar perfil", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .addOnFailureListener(e ->
+                        Toast.makeText(requireContext(),
+                                "Error cargando perfil", Toast.LENGTH_SHORT).show()
+                );
+
+        // Solo si es VIP permitimos estos listeners
+        b.btnSelectImage.setOnClickListener(v -> {
+            if (!isVip) return;
+            showImagePickerDialog();
+        });
+        b.btnSave.setOnClickListener(v -> {
+            if (!isVip) return;
+            saveProfile();
+        });
 
         return b.getRoot();
     }
 
-    /** Muestra un diálogo con opción Cámara o Galería */
     private void showImagePickerDialog() {
         String[] options = {"Tomar foto", "Elegir de la Galería"};
         new AlertDialog.Builder(requireContext())
@@ -114,8 +145,9 @@ public class EditProfileFragment extends Fragment {
                 .setItems(options, (dialog, which) -> {
                     if (which == 0) {
                         // Cámara
-                        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA)
-                                != PackageManager.PERMISSION_GRANTED) {
+                        if (ContextCompat.checkSelfPermission(requireContext(),
+                                Manifest.permission.CAMERA) !=
+                                PackageManager.PERMISSION_GRANTED) {
                             requestPermissions(
                                     new String[]{Manifest.permission.CAMERA},
                                     1001
@@ -124,7 +156,6 @@ public class EditProfileFragment extends Fragment {
                             openCamera();
                         }
                     } else {
-                        // Galería
                         openGallery();
                     }
                 })
@@ -132,8 +163,7 @@ public class EditProfileFragment extends Fragment {
     }
 
     private void openCamera() {
-        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        cameraLauncher.launch(intent);
+        cameraLauncher.launch(new Intent(MediaStore.ACTION_IMAGE_CAPTURE));
     }
 
     private void openGallery() {
@@ -145,8 +175,9 @@ public class EditProfileFragment extends Fragment {
                                            @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == 1001 && grantResults.length > 0
-                && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+        if (requestCode == 1001 &&
+                grantResults.length > 0 &&
+                grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             openCamera();
         } else if (requestCode == 1001) {
             Toast.makeText(requireContext(),
@@ -155,7 +186,8 @@ public class EditProfileFragment extends Fragment {
     }
 
     private void saveProfile() {
-        if (user == null) return;
+        if (!isVip || user == null) return;
+
         String name    = b.etName.getText().toString().trim();
         String phone   = b.etPhone.getText().toString().trim();
         String address = b.etAddress.getText().toString().trim();
@@ -164,24 +196,21 @@ public class EditProfileFragment extends Fragment {
         updates.put("name",    name);
         updates.put("phone",   phone);
         updates.put("address", address);
-
         if (pickedImageUri != null) {
             updates.put("photoUrl", pickedImageUri.toString());
         } else if (currentPhotoUrl != null) {
             updates.put("photoUrl", currentPhotoUrl);
         }
 
-        commitUpdates(updates);
-    }
-
-    private void commitUpdates(Map<String,Object> updates) {
         db.collection("users").document(user.getUid())
                 .update(updates)
                 .addOnSuccessListener(a ->
-                        Toast.makeText(requireContext(),"Perfil actualizado",Toast.LENGTH_SHORT).show()
+                        Toast.makeText(requireContext(),
+                                "Perfil actualizado", Toast.LENGTH_SHORT).show()
                 )
                 .addOnFailureListener(e ->
-                        Toast.makeText(requireContext(),"Error guardando perfil",Toast.LENGTH_SHORT).show()
+                        Toast.makeText(requireContext(),
+                                "Error guardando perfil", Toast.LENGTH_SHORT).show()
                 );
     }
 

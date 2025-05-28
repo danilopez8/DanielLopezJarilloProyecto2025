@@ -3,7 +3,8 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="24dp">
+    android:padding="24dp"
+    android:background="@drawable/side_nav_bar">
 
     <LinearLayout
         android:orientation="vertical"

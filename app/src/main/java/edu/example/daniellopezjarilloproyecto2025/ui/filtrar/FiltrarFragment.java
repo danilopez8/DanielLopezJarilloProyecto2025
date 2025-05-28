@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -14,7 +15,6 @@ import com.google.android.material.datepicker.CalendarConstraints;
 import com.google.android.material.datepicker.CompositeDateValidator;
 import com.google.android.material.datepicker.DateValidatorPointForward;
 import com.google.android.material.datepicker.MaterialDatePicker;
-import com.google.android.material.datepicker.MaterialDatePicker.Builder;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
@@ -30,11 +30,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import edu.example.daniellopezjarilloproyecto2025.R;
 import edu.example.daniellopezjarilloproyecto2025.adapters.CarAdapter;
 import edu.example.daniellopezjarilloproyecto2025.adapters.MarcaAdapter;
 import edu.example.daniellopezjarilloproyecto2025.databinding.FragmentFiltrarBinding;
-import edu.example.daniellopezjarilloproyecto2025.models.Marca;
 import edu.example.daniellopezjarilloproyecto2025.models.Car;
+import edu.example.daniellopezjarilloproyecto2025.models.Marca;
 import edu.example.daniellopezjarilloproyecto2025.utils.FakeCarData;
 import androidx.core.util.Pair;
 
@@ -42,48 +43,46 @@ public class FiltrarFragment extends Fragment {
 
     private FragmentFiltrarBinding binding;
 
-    // Mapa "brand|model" -> fechas ya reservadas
+    // "brand|model" → fechas reservadas
     private final Map<String, Set<String>> reservedDatesMap = new HashMap<>();
 
-    // Fechas seleccionadas por el usuario (rango)
+    // Filtros activos
     private List<String> selectedDates = null;
-    // Marca seleccionada por el usuario
     private String selectedBrand = null;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentFiltrarBinding.inflate(inflater, container, false);
-        View root = binding.getRoot();
 
-        // LayoutManagers
-        binding.recyclerViewMarcas.setLayoutManager(new GridLayoutManager(requireContext(), 2));
-        binding.recyclerViewCochesFiltrados.setLayoutManager(new LinearLayoutManager(requireContext()));
+        // Grid de marcas / lista de coches
+        binding.recyclerViewMarcas
+                .setLayoutManager(new GridLayoutManager(requireContext(), 2));
+        binding.recyclerViewCochesFiltrados
+                .setLayoutManager(new LinearLayoutManager(requireContext()));
 
-        // Pre-cargo reservas para el filtro de fechas
         cargarReservas();
 
-        // Botón para elegir rango de fechas
+        // Botón “Filtrar por fecha”
         binding.btnFilterDate.setOnClickListener(v -> {
             long hoyUtc = MaterialDatePicker.todayInUtcMilliseconds();
-            CalendarConstraints constraints = new CalendarConstraints.Builder()
+            CalendarConstraints cons = new CalendarConstraints.Builder()
                     .setValidator(CompositeDateValidator.allOf(
                             List.of(DateValidatorPointForward.now())
                     ))
                     .build();
 
-            Builder<Pair<Long, Long>> picker = MaterialDatePicker.Builder.dateRangePicker();
-            picker.setTitleText("Selecciona rango de fechas");
-            picker.setCalendarConstraints(constraints);
-            MaterialDatePicker<Pair<Long, Long>> dateRangePicker = picker.build();
+            MaterialDatePicker<Pair<Long,Long>> picker =
+                    MaterialDatePicker.Builder.dateRangePicker()
+                            .setTitleText("Selecciona rango de fechas")
+                            .setCalendarConstraints(cons)
+                            .build();
 
-            dateRangePicker.show(getParentFragmentManager(), "RANGE_PICKER");
-            dateRangePicker.addOnPositiveButtonClickListener(range -> {
-                // Calculo todas las fechas entre inicio y fin
+            picker.show(getParentFragmentManager(), "RANGE_PICKER");
+            picker.addOnPositiveButtonClickListener(range -> {
+                SimpleDateFormat fmt = new SimpleDateFormat("d/M/yyyy", Locale.getDefault());
                 Calendar start = Calendar.getInstance();
                 Calendar end   = Calendar.getInstance();
-                SimpleDateFormat fmt = new SimpleDateFormat("d/M/yyyy", Locale.getDefault());
-
                 start.setTimeInMillis(range.first);
                 end.setTimeInMillis(range.second);
 
@@ -94,26 +93,25 @@ public class FiltrarFragment extends Fragment {
                     it.add(Calendar.DAY_OF_MONTH, 1);
                 }
                 selectedDates = fechas;
-                selectedBrand = null;      // reseteamos marca
+                selectedBrand = null;
                 updateDisplay();
             });
         });
 
-        // Botón volver (deshace filtro de marca y vuelve a mostrar marcas)
+        // Botón “Volver a marcas”
         binding.btnVolverMarcas.setOnClickListener(v -> {
             selectedBrand = null;
             updateDisplay();
         });
 
-        // Al principio mostramos TODAS las marcas
+        // Estado inicial
         selectedDates = null;
         selectedBrand = null;
         updateDisplay();
 
-        return root;
+        return binding.getRoot();
     }
 
-    /** Carga todas las reservas y rellena reservedDatesMap */
     private void cargarReservas() {
         FirebaseFirestore.getInstance()
                 .collection("reservations")
@@ -124,21 +122,17 @@ public class FiltrarFragment extends Fragment {
                         String brand = doc.getString("carBrand");
                         String model = doc.getString("carModel");
                         String key   = brand + "|" + model;
-                        Set<String> dates = reservedDatesMap.computeIfAbsent(key, k -> new HashSet<>());
+                        Set<String> dates = reservedDatesMap
+                                .computeIfAbsent(key, k -> new HashSet<>());
 
-                        if (doc.contains("reservationDate")) {
-                            String d = doc.getString("reservationDate");
-                            if (d != null) dates.add(d);
-                        } else if (doc.contains("startDate") && doc.contains("endDate")) {
+                        if (doc.contains("startDate") && doc.contains("endDate")) {
                             try {
                                 Calendar cs = Calendar.getInstance();
                                 Calendar ce = Calendar.getInstance();
                                 String[] p1 = doc.getString("startDate").split("/");
                                 String[] p2 = doc.getString("endDate").split("/");
-
-                                cs.set(Integer.parseInt(p1[2]), Integer.parseInt(p1[1]) - 1, Integer.parseInt(p1[0]), 0,0,0);
-                                ce.set(Integer.parseInt(p2[2]), Integer.parseInt(p2[1]) - 1, Integer.parseInt(p2[0]), 0,0,0);
-
+                                cs.set(Integer.parseInt(p1[2]), Integer.parseInt(p1[1]) - 1, Integer.parseInt(p1[0]));
+                                ce.set(Integer.parseInt(p2[2]), Integer.parseInt(p2[1]) - 1, Integer.parseInt(p2[0]));
                                 Calendar it = (Calendar) cs.clone();
                                 while (!it.after(ce)) {
                                     dates.add(fmt.format(it.getTime()));
@@ -147,74 +141,78 @@ public class FiltrarFragment extends Fragment {
                             } catch (Exception ignored) {}
                         }
                     }
-                    // Tras cargar reservas, refrescamos la vista inicial
                     updateDisplay();
                 });
     }
 
-    /** Recalcula y muestra marcas o coches según los filtros activos */
     private void updateDisplay() {
         List<Car> allCars = FakeCarData.getCars(requireContext());
         if (allCars == null) allCars = List.of();
 
-        // Si NO hay marca seleccionada:
         if (selectedBrand == null) {
-            //  – Si tampoco hay fecha, muestro todas las marcas
-            //  – Si hay fecha, muestro solo las marcas con algún coche disponible en ese rango
-            Set<String> marcasVisibles = new LinkedHashSet<>();
+            // Mostrar marcas disponibles
+            Set<String> marcas = new LinkedHashSet<>();
             for (Car c : allCars) {
                 String key = c.brand + "|" + c.model;
-                // comprobar disponibilidad
-                boolean ok = true;
-                if (selectedDates != null) {
-                    Set<String> reserved = reservedDatesMap.getOrDefault(key, Set.of());
-                    for (String d : selectedDates) {
-                        if (reserved.contains(d)) {
-                            ok = false;
-                            break;
-                        }
-                    }
-                }
-                if (ok) marcasVisibles.add(c.brand);
+                boolean ok = selectedDates == null
+                        || reservedDatesMap.getOrDefault(key, Set.of())
+                        .stream().noneMatch(selectedDates::contains);
+                if (ok) marcas.add(c.brand);
             }
-            List<Marca> listaMarcas = marcasVisibles.stream()
-                    .map(name -> new Marca(name, android.R.drawable.ic_menu_gallery))
+            List<Marca> lista = marcas.stream()
+                    .map(name -> new Marca(name, getIconForBrand(name)))
                     .collect(Collectors.toList());
 
-            MarcaAdapter ma = new MarcaAdapter(
-                    listaMarcas,
-                    requireContext(),
-                    marca -> {
+            binding.recyclerViewMarcas
+                    .setAdapter(new MarcaAdapter(lista, requireContext(), marca -> {
                         selectedBrand = marca;
                         updateDisplay();
-                    }
-            );
-            binding.recyclerViewMarcas.setAdapter(ma);
+                    }));
             binding.recyclerViewMarcas.setVisibility(View.VISIBLE);
             binding.recyclerViewCochesFiltrados.setVisibility(View.GONE);
             binding.btnVolverMarcas.setVisibility(View.GONE);
-        }
-        // Si hay marca seleccionada, muestro LISTA de COCHES filtrados
-        else {
+
+        } else {
+            // Mostrar lista de coches filtrados
             List<Car> filtrados = allCars.stream()
                     .filter(c -> c.brand.equalsIgnoreCase(selectedBrand))
                     .filter(c -> {
                         if (selectedDates == null) return true;
                         String key = c.brand + "|" + c.model;
-                        Set<String> reserved = reservedDatesMap.getOrDefault(key, Set.of());
-                        for (String d : selectedDates) {
-                            if (reserved.contains(d)) return false;
-                        }
-                        return true;
+                        return reservedDatesMap.getOrDefault(key, Set.of())
+                                .stream().noneMatch(selectedDates::contains);
                     })
                     .collect(Collectors.toList());
 
-            CarAdapter carAdapter = new CarAdapter(filtrados, requireContext());
-            binding.recyclerViewCochesFiltrados.setAdapter(carAdapter);
-
+            binding.recyclerViewCochesFiltrados
+                    .setAdapter(new CarAdapter(filtrados, requireContext()));
             binding.recyclerViewMarcas.setVisibility(View.GONE);
             binding.recyclerViewCochesFiltrados.setVisibility(View.VISIBLE);
             binding.btnVolverMarcas.setVisibility(View.VISIBLE);
+        }
+    }
+
+    /** Switch explícito de nombre → JPG sin extensión */
+    private @DrawableRes int getIconForBrand(String brandName) {
+        switch (brandName.toLowerCase(Locale.ROOT)) {
+            case "ferrari":       return R.drawable.ferrari;
+            case "lamborghini":   return R.drawable.lambo;
+            case "porsche":       return R.drawable.porsche;
+            case "mclaren":       return R.drawable.mclaren;
+            case "aston martin":  return R.drawable.aston;
+            case "audi":          return R.drawable.audi;
+            case "mercedes-benz": return R.drawable.mercedes;
+            case "bmw":           return R.drawable.bmw;
+            case "tesla":         return R.drawable.tesla;
+            case "bentley":       return R.drawable.bentley;
+            case "rolls-royce":   return R.drawable.rolls;
+            case "bugatti":       return R.drawable.bugatti;
+            case "jaguar":        return R.drawable.jaguar;
+            case "maserati":      return R.drawable.maseratti;
+            case "koenigsegg":    return R.drawable.koen;
+            case "pagani":        return R.drawable.pagani;
+            case "ford":          return R.drawable.ford;
+            default:              return R.drawable.ic_launcher_background;
         }
     }
 

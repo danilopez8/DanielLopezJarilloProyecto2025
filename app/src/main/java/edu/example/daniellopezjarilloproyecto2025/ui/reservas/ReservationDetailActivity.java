@@ -1,4 +1,3 @@
-// ReservationDetailActivity.java
 package edu.example.daniellopezjarilloproyecto2025.ui.reservas;
 
 import android.Manifest;

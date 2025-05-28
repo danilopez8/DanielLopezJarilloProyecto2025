@@ -25,7 +25,7 @@
 
     <fragment
         android:id="@+id/editProfileFragment"
-        android:name="edu.example.daniellopezjarilloproyecto2025.ui.profile.EditProfileFragment"
+        android:name="edu.example.daniellopezjarilloproyecto2025.ui.perfil.EditProfileFragment"
         android:label="Editar perfil" />
 
 </navigation>

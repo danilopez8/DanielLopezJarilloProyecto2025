@@ -1,4 +1,3 @@
-// CarDetailActivity.java
 package edu.example.daniellopezjarilloproyecto2025.ui.concesionario;
 
 import android.Manifest;
