@@ -4,7 +4,7 @@
     android:padding="24dp"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/fondo">
+    android:background="@drawable/fondoluxe">
 
     <!-- Nuevo: campo para el nombre -->
     <EditText
@@ -29,6 +29,7 @@
         android:layout_height="wrap_content"
         android:hint="Contraseña"
         android:inputType="textPassword"
+        android:maxLength="12"
         android:layout_marginBottom="16dp"/>
 
     <EditText
@@ -37,6 +38,7 @@
         android:layout_height="wrap_content"
         android:hint="Confirmar contraseña"
         android:inputType="textPassword"
+        android:maxLength="12"
         android:layout_marginBottom="24dp"/>
 
     <Button

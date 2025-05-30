@@ -54,6 +54,7 @@
         android:inputType="textPassword"
         android:padding="12dp"
         android:layout_marginTop="12dp"
+        android:maxLength="12"
         app:layout_constraintTop_toBottomOf="@id/editTextEmail"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

@@ -10,7 +10,7 @@
     <item
         android:id="@+id/nav_slideshow"
         android:icon="@drawable/filtrar"
-        android:title="@string/menu_slideshow" />
+        android:title="Filtrar" />
     <item
         android:id="@+id/editProfileFragment"
         android:icon="@drawable/editar"
