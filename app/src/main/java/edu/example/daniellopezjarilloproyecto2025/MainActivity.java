@@ -160,7 +160,7 @@ public class MainActivity extends AppCompatActivity {
                         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
                         // 1) Recogemos y borramos todas las reservas de este email
-                        db.collection("reservations")
+                        db.collection("reservas")
                                 .whereEqualTo("email", email)
                                 .get()
                                 .addOnSuccessListener(resSnapshot -> {

@@ -114,7 +114,7 @@ public class FiltrarFragment extends Fragment {
 
     private void cargarReservas() {
         FirebaseFirestore.getInstance()
-                .collection("reservations")
+                .collection("reservas") // <-- aquí se cambió de "reservations" a "reservas"
                 .get()
                 .addOnSuccessListener(qs -> {
                     SimpleDateFormat fmt = new SimpleDateFormat("d/M/yyyy", Locale.getDefault());

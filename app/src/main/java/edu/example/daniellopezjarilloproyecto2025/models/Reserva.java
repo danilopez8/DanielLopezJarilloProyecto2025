@@ -1,18 +1,19 @@
+// Reserva.java
 package edu.example.daniellopezjarilloproyecto2025.models;
 
 import java.util.List;
 
 public class Reserva {
-    public String reservationId;   // ID de Firestore
-    public String carId;           // <- nuevo campo: ID del coche
+    public String reservationId;   // ID del documento en Firestore ("reservas" collection)
+    public String carId;           // <-- nuevo campo: ID del coche en la colección "coches"
     public String brand;
     public String model;
-    public String date;
-    public String location;
+    public String date;            // Ej: "Del 2/6/2025 al 4/6/2025"
+    public String location;        // Ej: "Málaga", "Sevilla", etc.
     public int price;
-    public List<String> images;
+    public List<String> images;    // URLs de imágenes del coche
 
-    // Constructor original (para compatibilidad)
+    // Constructor original: (sin carId, para compatibilidad)
     public Reserva(String reservationId,
                    String brand,
                    String model,

@@ -68,7 +68,7 @@ public class SignInActivity extends AppCompatActivity {
                         ? AppCompatDelegate.MODE_NIGHT_YES
                         : AppCompatDelegate.MODE_NIGHT_NO
         );
-        // ----------------------------------------------------------
+
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_in); // Establece el layout

@@ -58,24 +58,21 @@ public class CarAdapter extends RecyclerView.Adapter<CarAdapter.CarViewHolder> {
         // Configuramos el evento al hacer clic sobre el ítem.
         holder.itemView.setOnClickListener(v -> {
             Intent intent = new Intent(context, CarDetailActivity.class);
-            // Añadimos los datos del coche como extra intent
-            intent.putExtra("car_id", car.id);
+
+            // Asumamos que car.id ya es “1”, “2”, “3” … (String)
+            intent.putExtra("car_id",  car.id);
             intent.putExtra("car_brand", car.brand);
             intent.putExtra("car_model", car.model);
-            intent.putExtra("car_year", car.year);
+            intent.putExtra("car_year",  car.year);
             intent.putExtra("car_price", car.rental_price);
             intent.putStringArrayListExtra("car_images", new ArrayList<>(car.images));
+            intent.putExtra("car_lat", car.location.lat);
+            intent.putExtra("car_lng", car.location.lng);
+            intent.putExtra("car_city", car.location.city);
 
-            // Añadimos la ubicación (Si la tiene?
-            if (car.location != null) {
-                intent.putExtra("car_lat", car.location.lat);
-                intent.putExtra("car_lng", car.location.lng);
-                intent.putExtra("car_city", car.location.city);
-            }
-
-            // Lanzamos la actividad del detalle
             context.startActivity(intent);
         });
+
     }
 
     // Devuelve la cantidad total de elementos en la lista.

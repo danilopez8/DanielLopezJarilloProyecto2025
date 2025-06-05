@@ -27,6 +27,7 @@
             android:layout_height="wrap_content"
             android:hint="Teléfono"
             android:inputType="phone"
+            android:maxLength="18"
             android:layout_marginTop="4dp"/>
 
         <!-- Dirección -->
@@ -35,6 +36,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Dirección"
+            android:maxLength="30"
             android:inputType="textPostalAddress"
             android:layout_marginTop="12dp"/>
 

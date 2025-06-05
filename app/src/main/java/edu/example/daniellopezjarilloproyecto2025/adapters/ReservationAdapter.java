@@ -1,3 +1,4 @@
+// ReservationAdapter.java
 package edu.example.daniellopezjarilloproyecto2025.adapters;
 
 import android.content.Context;
@@ -21,7 +22,7 @@ import edu.example.daniellopezjarilloproyecto2025.ui.reservas.ReservationDetailA
 
 public class ReservationAdapter extends RecyclerView.Adapter<ReservationAdapter.ReservationViewHolder> {
 
-    // Declaramos las variables
+    // Lista de reservas cargadas desde Firestore
     private final List<Reserva> reservas;
     private final Context context;
 
@@ -30,7 +31,6 @@ public class ReservationAdapter extends RecyclerView.Adapter<ReservationAdapter.
         this.context  = context;
     }
 
-    // Inflamos la vista de cada item del RecycledView
     @NonNull
     @Override
     public ReservationViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -38,25 +38,27 @@ public class ReservationAdapter extends RecyclerView.Adapter<ReservationAdapter.
         return new ReservationViewHolder(v);
     }
 
-    // Asignamos los datos de la reserva a la vista
     @Override
     public void onBindViewHolder(@NonNull ReservationViewHolder holder, int pos) {
         Reserva r = reservas.get(pos);
 
+        // Mostramos la información directamente desde la propia reserva:
         holder.txtBrand.setText("Marca: " + r.brand);
         holder.txtModel.setText("Modelo: " + r.model);
         holder.txtDate.setText("Fecha: " + r.date);
         holder.txtLocation.setText("Ubicación: " + r.location);
 
-        // Asignamos la foto
+        // Si existe al menos una URL de imagen, cargamos la primera con Glide
         if (r.images != null && !r.images.isEmpty()) {
             Glide.with(context).load(r.images.get(0)).into(holder.imageCar);
         }
 
-        // Si hacemos click, se nos abre la vista en detalle
+        // Cuando el usuario pulsa en una tarjeta, abre ReservationDetailActivity
         holder.itemView.setOnClickListener(v -> {
             Intent i = new Intent(context, ReservationDetailActivity.class);
+            // Enviamos el ID de la reserva y los datos del coche para mostrar en detalle:
             i.putExtra("reservationId", r.reservationId);
+            i.putExtra("carId",         r.carId);
             i.putExtra("brand",         r.brand);
             i.putExtra("model",         r.model);
             i.putExtra("date",          r.date);
@@ -72,7 +74,6 @@ public class ReservationAdapter extends RecyclerView.Adapter<ReservationAdapter.
         return reservas.size();
     }
 
-    // Clase interna ViewHolder que contiene las referencias a las vistas de cada ítem.
     static class ReservationViewHolder extends RecyclerView.ViewHolder {
         ImageView imageCar;
         TextView txtBrand, txtModel, txtDate, txtLocation;
