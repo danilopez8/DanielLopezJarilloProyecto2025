@@ -5,11 +5,11 @@ import java.util.List;
 
 public class Reserva {
     public String reservationId;   // ID del documento en Firestore ("reservas" collection)
-    public String carId;           // <-- nuevo campo: ID del coche en la colección "coches"
+    public String carId;
     public String brand;
     public String model;
-    public String date;            // Ej: "Del 2/6/2025 al 4/6/2025"
-    public String location;        // Ej: "Málaga", "Sevilla", etc.
+    public String date;
+    public String location;
     public int price;
     public List<String> images;    // URLs de imágenes del coche
 

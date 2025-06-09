@@ -117,6 +117,7 @@ public class FiltrarFragment extends Fragment {
                 .collection("reservas") // <-- aquí se cambió de "reservations" a "reservas"
                 .get()
                 .addOnSuccessListener(qs -> {
+                    if (!isAdded() || binding == null) return;
                     SimpleDateFormat fmt = new SimpleDateFormat("d/M/yyyy", Locale.getDefault());
                     for (QueryDocumentSnapshot doc : qs) {
                         String brand = doc.getString("carBrand");

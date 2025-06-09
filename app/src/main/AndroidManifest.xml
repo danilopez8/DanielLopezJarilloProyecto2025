@@ -46,6 +46,12 @@
             android:value="AIzaSyDdtUX_Dzb-GEfb8ydV8ITMTpcsPPhVWzw" />
 
         <activity
+            android:name=".ui.perfil.EditProfileFragment"
+            android:theme="@style/Theme.DanielLopezJarilloProyecto2025">
+            <!-- … -->
+        </activity>
+
+        <activity
             android:name=".ui.concesionario.CarDetailActivity"
             android:exported="false" />
         <activity

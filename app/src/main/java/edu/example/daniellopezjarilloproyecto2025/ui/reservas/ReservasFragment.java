@@ -82,6 +82,7 @@ public class ReservasFragment extends Fragment {
                 .whereEqualTo("userId", uid)
                 .get()
                 .addOnSuccessListener(querySnapshot -> {
+                    if (!isAdded() || binding == null) return;
                     // Si no hay documentos, dejamos el RecyclerView vacío
                     if (querySnapshot.isEmpty()) {
                         adapter.notifyDataSetChanged();

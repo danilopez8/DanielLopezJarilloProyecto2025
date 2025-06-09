@@ -193,5 +193,5 @@ public class VipActivity extends AppCompatActivity {
         // 6) Codificamos a Base64 y devolvemos la cadena
         return Base64.encodeToString(combined, Base64.NO_WRAP);
     }
-    // ---------------------------------------------------------------------------------------
+
 }

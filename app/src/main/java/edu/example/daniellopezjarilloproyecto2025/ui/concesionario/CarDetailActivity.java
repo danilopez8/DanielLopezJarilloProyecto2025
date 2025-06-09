@@ -163,7 +163,6 @@ public class CarDetailActivity extends AppCompatActivity implements OnMapReadyCa
 
     /**
      * Muestra el DatePicker de rango. Tras confirmar, verifica que no choque con fechas guardadas
-     * y, si todo OK, pregunta “¿Deseas reservar…?” → guardarCocheYReservaEnFirestore().
      */
     private void mostrarSelectorRango() {
         long hoyUtc = MaterialDatePicker.todayInUtcMilliseconds();
@@ -269,6 +268,7 @@ public class CarDetailActivity extends AppCompatActivity implements OnMapReadyCa
                 .document(carId)
                 .set(datosCoche, SetOptions.merge())
                 .addOnSuccessListener(aVoid -> {
+                    
                     // 4) Si la operación de “guardar coche” fue exitosa, entonces creamos la reserva:
                     Map<String, Object> reserva = new HashMap<>();
                     reserva.put("userId",     u.getUid());

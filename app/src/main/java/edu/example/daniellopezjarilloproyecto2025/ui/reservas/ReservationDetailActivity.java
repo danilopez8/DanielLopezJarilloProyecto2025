@@ -54,6 +54,7 @@ public class ReservationDetailActivity extends AppCompatActivity implements OnMa
         super.onCreate(s);
         setContentView(R.layout.activity_reservation_detail);
 
+
         // Leemos el ID de la reserva que vino en el Intent
         reservationId = getIntent().getStringExtra("reservationId");
 
@@ -150,6 +151,7 @@ public class ReservationDetailActivity extends AppCompatActivity implements OnMa
     @Override
     public void onMapReady(GoogleMap gm) {
         // Tomamos lat/lng y city del Intent para situar el marcador
+
         double lat = getIntent().getDoubleExtra("lat", 0.0);
         double lng = getIntent().getDoubleExtra("lng", 0.0);
         String city = getIntent().getStringExtra("location");

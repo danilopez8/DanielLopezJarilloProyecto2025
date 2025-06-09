@@ -257,7 +257,7 @@ public class EditProfileFragment extends Fragment {
         String name = b.etName.getText().toString().trim();
         String addressPlain = b.etAddress.getText().toString().trim();
 
-        // —————— VALIDAR teléfono con CountryCodePicker ——————
+
         if (!b.ccp.isValidFullNumber()) {
             b.etPhone.setError("Número inválido para " + b.ccp.getSelectedCountryName());
             return;
@@ -267,7 +267,7 @@ public class EditProfileFragment extends Fragment {
         Map<String,Object> updates = new HashMap<>();
         updates.put("name", name);
 
-        // ---- Cifrar teléfono y dirección si es posible ----
+        // Cifrar teléfono y dirección si es posible
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             try {
                 String encryptedPhone   = encryptString(phonePlain);
@@ -282,7 +282,7 @@ public class EditProfileFragment extends Fragment {
                 return;
             }
         } else {
-            // Versiones < M: guardamos en claro
+
             updates.put("phone", phonePlain);
             updates.put("address", addressPlain);
         }
@@ -311,7 +311,7 @@ public class EditProfileFragment extends Fragment {
         b = null;
     }
 
-    // ---------------- Métodos de cifrado/descifrado con Android Keystore ----------------
+    // Métodos de cifrado/descifrado con Android Keystore
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     private SecretKey getOrCreateSecretKey() throws Exception {
@@ -337,54 +337,54 @@ public class EditProfileFragment extends Fragment {
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     private String encryptString(String plainText) throws Exception {
-        // 1) Obtenemos la clave del Keystore (o la creamos si no existe)
+        // Obtenemos la clave del Keystore (o la creamos si no existe)
         SecretKey key = getOrCreateSecretKey();
 
-        // 2) Pedimos un Cipher para AES/GCM, sin IV explícito (el Keystore lo genera internamente)
+        // Pedimos un Cipher para AES/GCM, sin IV explícito (el Keystore lo genera internamente)
         Cipher cipher = Cipher.getInstance(TRANSFORMATION);
         cipher.init(Cipher.ENCRYPT_MODE, key);
 
-        // 3) Recuperamos el IV que se generó dentro del Keystore
+        // Recuperamos el IV que se generó dentro del Keystore
         byte[] iv = cipher.getIV(); // longitud = GCM_IV_LENGTH = 12
 
-        // 4) Ciframos el texto plano
+        // Ciframos el texto plano
         byte[] cipherBytes = cipher.doFinal(plainText.getBytes(StandardCharsets.UTF_8));
 
-        // 5) Concatenamos IV + ciphertext
+        // Concatenamos IV + ciphertext
         ByteBuffer byteBuffer = ByteBuffer.allocate(iv.length + cipherBytes.length);
         byteBuffer.put(iv);
         byteBuffer.put(cipherBytes);
         byte[] combined = byteBuffer.array();
 
-        // 6) Codificamos a Base64 y devolvemos la cadena
+        // Codificamos a Base64 y devolvemos la cadena
         return Base64.encodeToString(combined, Base64.NO_WRAP);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     private String decryptString(String base64IvCipher) throws Exception {
-        // 1) Obtenemos la misma clave del Keystore
+        // Obtenemos la misma clave del Keystore
         SecretKey key = getOrCreateSecretKey();
 
-        // 2) Decodificamos Base64 para recuperar IV + ciphertext
+        // Decodificamos Base64 para recuperar IV + ciphertext
         byte[] combined = Base64.decode(base64IvCipher, Base64.NO_WRAP);
         ByteBuffer byteBuffer = ByteBuffer.wrap(combined);
 
-        // 3) Extraemos IV (primeros GCM_IV_LENGTH bytes)
+        // Extraemos IV (primeros GCM_IV_LENGTH bytes)
         byte[] iv = new byte[GCM_IV_LENGTH];
         byteBuffer.get(iv);
 
-        // 4) Extraemos ciphertext (bytes restantes)
+        // Extraemos ciphertext (bytes restantes)
         byte[] cipherBytes = new byte[byteBuffer.remaining()];
         byteBuffer.get(cipherBytes);
 
-        // 5) Creamos el Cipher con el mismo algoritmo y IV
+        // Creamos el Cipher con el mismo algoritmo y IV
         Cipher cipher = Cipher.getInstance(TRANSFORMATION);
         GCMParameterSpec spec = new GCMParameterSpec(GCM_TAG_LENGTH, iv);
         cipher.init(Cipher.DECRYPT_MODE, key, spec);
 
-        // 6) Desciframos y devolvemos el texto plano
+        // Desciframos y devolvemos el texto plano
         byte[] plainBytes = cipher.doFinal(cipherBytes);
         return new String(plainBytes, StandardCharsets.UTF_8);
     }
-    // ---------------------------------------------------------------------------------------
+
 }
