@@ -10,4 +10,6 @@
     <string name="menu_home">Concesionario</string>
     <string name="menu_gallery">Mis reservas</string>
     <string name="menu_slideshow">Filtrar por marcas</string>
+    <string name="marca_icon">Icono de marca</string>
+
 </resources>

@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="24dp">
+    android:padding="24dp"
+    android:background="@drawable/side_nav_bar">
 
     <LinearLayout
         android:orientation="vertical"
@@ -17,14 +19,24 @@
             android:layout_height="120dp"
             android:scaleType="centerCrop"
             android:src="@mipmap/ic_launcher_round"
-            android:background="@drawable/circle_bg"/>
+            android:background="@drawable/circle_bg" />
 
-        <Button
+        <!-- BOTÓN “Cambiar foto” corregido -->
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btnSelectImage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Cambiar foto"
-            android:layout_marginTop="8dp"/>
+            android:textColor="@android:color/white"
+            android:textSize="14sp"
+            android:paddingVertical="6dp"
+            android:paddingHorizontal="16dp"
+            android:background="@drawable/button_custom"
+            app:backgroundTint="@null"
+            android:elevation="4dp"
+            android:translationZ="4dp"
+            app:rippleColor="@color/teal_200"
+            android:layout_marginTop="8dp" />
 
         <EditText
             android:id="@+id/etName"
@@ -32,15 +44,24 @@
             android:layout_height="wrap_content"
             android:hint="Nombre completo"
             android:inputType="textPersonName"
-            android:layout_marginTop="16dp"/>
+            android:maxLength="18"
+            android:layout_marginTop="16dp" />
+
+        <com.hbb20.CountryCodePicker
+            android:id="@+id/ccp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:ccp_autoDetectCountry="true"
+            app:ccp_autoFormatNumber="true" />
 
         <EditText
             android:id="@+id/etPhone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
             android:hint="Teléfono"
             android:inputType="phone"
-            android:layout_marginTop="8dp"/>
+            android:maxLength="18" />
 
         <EditText
             android:id="@+id/etAddress"
@@ -48,13 +69,25 @@
             android:layout_height="wrap_content"
             android:hint="Dirección"
             android:inputType="textPostalAddress"
-            android:layout_marginTop="8dp"/>
+            android:maxLength="30"
+            android:layout_marginTop="8dp" />
 
-        <Button
+        <!-- BOTÓN “Guardar” corregido -->
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btnSave"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Guardar"
-            android:layout_marginTop="24dp"/>
+            android:textColor="@android:color/white"
+            android:textSize="14sp"
+            android:paddingVertical="6dp"
+            android:paddingHorizontal="16dp"
+            android:background="@drawable/button_custom"
+            app:backgroundTint="@null"
+            android:elevation="4dp"
+            android:translationZ="4dp"
+            app:rippleColor="@color/teal_200"
+            android:layout_marginTop="24dp" />
+
     </LinearLayout>
 </ScrollView>

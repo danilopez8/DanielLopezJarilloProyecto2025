@@ -2,9 +2,10 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:padding="24dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/fondo">
+    android:background="@drawable/fondoluxe">
 
     <!-- Nuevo: campo para el nombre -->
     <EditText
@@ -12,6 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Nombre completo"
+        android:maxLength="18"
         android:inputType="textPersonName"
         android:layout_marginBottom="16dp"/>
 
@@ -21,6 +23,7 @@
         android:layout_height="wrap_content"
         android:hint="Correo electrónico"
         android:inputType="textEmailAddress"
+        android:maxLength="30"
         android:layout_marginBottom="16dp"/>
 
     <EditText
@@ -29,6 +32,7 @@
         android:layout_height="wrap_content"
         android:hint="Contraseña"
         android:inputType="textPassword"
+        android:maxLength="12"
         android:layout_marginBottom="16dp"/>
 
     <EditText
@@ -37,11 +41,24 @@
         android:layout_height="wrap_content"
         android:hint="Confirmar contraseña"
         android:inputType="textPassword"
+        android:maxLength="12"
         android:layout_marginBottom="24dp"/>
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/btnRegister"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Registrarse"/>
+        android:text="Registrarse"
+        android:layout_marginTop="24dp"
+        android:layout_gravity="center_horizontal"
+        android:background="@drawable/button_custom"
+        app:backgroundTint="@null"
+        android:textColor="@android:color/white"
+        android:textSize="14sp"
+        android:paddingVertical="6dp"
+        android:paddingHorizontal="16dp"
+        android:elevation="4dp"
+        android:translationZ="4dp"
+        app:rippleColor="@color/teal_200" />
+
 </LinearLayout>
